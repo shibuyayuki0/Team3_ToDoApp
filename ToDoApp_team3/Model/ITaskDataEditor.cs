@@ -8,13 +8,13 @@ public interface ITaskDataEditor
     /// <summary>
     /// 優先度を表すリスト
     /// </summary>
-    List<Priorities> PriorityList { get; }
+    IReadOnlyList<Priorities> PriorityList { get; }
 
     /// <summary>
     /// タスクを1件追加する
     /// </summary>
-    /// <param name="task">追加したいタスク</param>
-    void Add(Tasks task);
+    /// <param name="newTask">追加したいタスク</param>
+    void Add(Tasks newTask);
 
     /// <summary>
     /// タスクの一覧を取得する
@@ -34,7 +34,7 @@ public interface ITaskDataEditor
     /// タスクの内容を更新する
     /// </summary>
     /// <param name="targetTask">更新タスク</param>
-    /// <exception cref="InvalidOperationException">
+    /// <exception cref="KeyNotFoundException">
     /// 存在しないタスクIDを含む更新タスクが渡されるとスローされる
     /// </exception>
     void Update(Tasks targetTask);
@@ -43,7 +43,7 @@ public interface ITaskDataEditor
     /// タスクを削除する
     /// </summary>
     /// <param name="taskId">削除するタスクのID</param>
-    /// <exception cref="InvalidOperationException">
+    /// <exception cref="KeyNotFoundException">
     /// 存在しないタスクIDを指定するとスローされる
     /// </exception>
     void Delete(int taskId);

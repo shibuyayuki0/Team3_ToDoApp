@@ -27,8 +27,8 @@ public interface ITaskDataEditor
     /// 指定したタスクを取得する
     /// </summary>
     /// <param name="taskId">取得するタスクのID</param>
-    /// <returns>タスク1件のデータ</returns>
-    Tasks GetTask(int taskId);
+    /// <returns>タスク1件のデータ、タスクIDが存在しない場合はNULL</returns>
+    Tasks? GetTask(int taskId);
 
     /// <summary>
     /// タスクの内容を更新する

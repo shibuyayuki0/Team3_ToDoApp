@@ -11,11 +11,30 @@ namespace ToDoApp_team3.Pages
 
         public Tasks? TargetTask { get; set; }
 
+        // タスク名
+        [BindProperty]
+        public string TaskName { get; set; }
+
+        [BindProperty]
+        public int SelectedPriorityId { get; set; }
+
+        public List<Priorities> PriorityList { get; set; }
+
+        [BindProperty]
+        public DateTime DeadlineAt { get; set; }
+
+        [BindProperty]
+        //詳細内容
+        public string ContentText { get; set; }
+
+      
         public IActionResult OnGet()
         {
             // IDが無ければ新規作成モードとして起動
             if (!TargetTaskId.HasValue)
             {
+                DateTime DeadlineAt = DateTime.Now;
+
                 return Page();
             }
 

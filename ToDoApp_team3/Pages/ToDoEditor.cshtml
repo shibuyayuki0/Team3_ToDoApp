@@ -5,4 +5,50 @@
 }
 
 <!-- 空データ -->
-@Model.TargetTaskId を開いています
+@if (Model.TargetTaskId.HasValue)
+{
+    <h1>編集</h1>
+}
+else
+{
+    <h1>新規作成</h1>
+}
+
+<form method="post">
+
+    <div>
+        タスク名：
+        <input type="text" asp-for="TaskName" />
+    </div>
+
+    <br />
+
+    <div>
+        優先度：
+ </div>
+
+    <br />
+
+    <div>
+        締切日：
+        <input type="date" asp-for="DeadlineAt" />
+    </div>
+
+    <br />
+
+    <div>
+        詳細内容：
+        <textarea asp-for="ContentText"></textarea>
+    </div>
+
+    <br />
+
+    <button type="submit">
+        更新
+    </button>
+
+    <a asp-page="Index">
+        キャンセル
+    </a>
+
+</form>

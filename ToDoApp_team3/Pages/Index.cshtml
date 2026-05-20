@@ -84,6 +84,17 @@
             }
         }
 
+        .Priority-1{
+            background-color: red;
+        }
+        .priority-2 {
+            background-color: orange;
+        }
+
+        .priority-3 {
+            background-color: royalblue;
+        }
+
         @@keyframes slideInRight {
             from {
                 transform: translateX(100%);
@@ -193,7 +204,7 @@
 <!-- 右表示メニュー -->
 <div id="detail-menu" class="detail-menu">
     <div id="target-id"></div>
-    <div id="Priorities.name"></div>
+    <div class=" task priority-@item.PriorityId"></div>
 </div>
 
 <!-- フロートボタン -->

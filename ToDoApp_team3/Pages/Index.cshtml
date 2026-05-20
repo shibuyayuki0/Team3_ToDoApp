@@ -4,7 +4,201 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- ヘッダー追加部品 -->
+@section AdditionalHeader{
+    <div class="container">
+        <!-- タイトル -->
+        <div class="row align-items-center">
+            <!-- 作成ボタン -->
+            <div class="col-2 text-center">
+                <a href="#" class="btn btn-primary">作成</a>
+            </div>
+            <div class="col-5">タスク名</div>
+            <div class="col">締切日</div>
+            <!-- フィルタリスト -->
+            <div class="col d-flex justify-content-end align-items-center">
+                <span>フィルター：</span>
+                <select class="d-inline-block">
+                    <option value="">未完了</option>
+                    <option value="">完了</option>
+                    <option value="">すべて</option>
+                </select>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Style -->
+@section Styles {
+    <style>
+        .return-button {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+
+            &.active {
+                opacity: 1;
+                visibility: visible;
+            }
+        }
+
+        .overlay{
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease;
+
+            &.active {
+                opacity: 1;
+                visibility: visible;
+            }
+        }
+
+        .detail-menu {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 35vw;
+            height: 100vh;
+            z-index: 3000;
+            background-color: #ffffff;
+            box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+
+            visibility: hidden;
+            transform: translateX(100%);
+
+            transition: transform 0.3s ease, visibility 0.3s;
+
+            &.active {
+                visibility: visible;
+                animation: slideInRight 0.3s forwards ease-out;
+            }
+        }
+
+        @@keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+            }
+
+            to {
+                transform: translateX(0);
+            }
+        }
+
+    </style>
+}
+
+
+<!-- JavaScript -->
+@section Scripts {
+    <script>
+        const overlay = document.getElementById("overlay");
+        const detailMenu = document.getElementById("detail-menu");
+        const targetId = document.getElementById("target-id");
+
+        // 1.暗転+詳細メニュー表示
+        document.addEventListener("click", (e) => {
+
+            // ボタンだった時はスキップ
+            if (e.target.closest('[data-without="true"]')) {
+                return;
+            }
+
+            // [data-id]属性をもっていれば処理
+            const targetTask = e.target.closest('[data-id]');
+            if (targetTask){
+                overlay.classList.add("active"); // 暗転
+                detailMenu.classList.add("active"); // 詳細メニュー表示
+                setDetailMenu(targetTask.getAttribute("data-id"));// 詳細メニューの値設定
+                return;
+            }
+            
+            // 右クリックメニュー以外がクリックされたら
+            if (!e.target.closest('#detail-menu')){
+                overlay.classList.remove("active"); // 暗転解除
+                detailMenu.classList.remove("active"); // 詳細メニュー解除
+                return;
+            }
+
+        });
+
+        // 2.詳細メニューの値設定
+        const setDetailMenu = (id) => {
+            targetId.textContent = id;
+        };
+
+
+        // 3.TOPへ戻る
+        // A.表示切替
+        document.addEventListener("scroll",()=>{
+            const scrollY = window.scrollY || document.documentElement.scrollTop;
+
+            document.getElementById("return-button").classList.toggle("active", scrollY > 100);
+        }, { passive: true });
+        // B.滑らか移動
+        document.getElementById("scroll-to-top").addEventListener("click", (e) => {
+            e.preventDefault();
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        });
+
+    </script>
+}
+
+<!-- 本体 -->
+<div class="container">
+    <!-- タスクリスト本体 -->
+    <div class="row">
+        @foreach (var item in Model.ItemList)
+        {
+            <!-- タスク1件 -->
+            <div class="col-12 d-flex gap-3">
+                <!-- 警告表示 -->
+                <div class="">
+                    <span style="font-size:3rem;">&#x26A0;&#xFE0F;</span>
+                </div>
+                <!-- タスク本体 -->
+                <div data-id="@item.id" class="flex-fill border rounded-3 p-4 mb-3 bg-primary-subtle text-primary-emphasis border-secondary-subtle">
+                    <div class="container align-items-center">
+                        <div class="row">
+                            <form method="post" class="col-1">
+                                <button type="submit" ata-without="true" class="btn shadow-none border border-secondary" style="width:2rem; height:2rem; z-index:1000"></button>
+                            </form>
+                            <div class="col">@item.name</div>
+                            <div class="col">@Model.DeadlineAt</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        }
+    </div>    
 </div>
+
+<!-- 暗転オブジェクト -->
+<div id="overlay" class="overlay"></div>
+
+<!-- 右表示メニュー -->
+<div id="detail-menu" class="detail-menu">
+    <div id="target-id"></div>
+</div>
+
+<!-- フロートボタン -->
+<div id="return-button" class="return-button position-fixed" style="left:30px; bottom:15px; z-index: 1050;">
+    <div class="">
+        <button id="scroll-to-top" class="btn btn-primary">TOPに戻る</button>
+    </div>
+</div>
+

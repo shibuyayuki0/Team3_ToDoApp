@@ -807,23 +807,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Shibuyayuki\\.nuget\\packages\\": {},
+    "C:\\Users\\tochi\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Shibuyayuki\\Desktop\\ToDoApp_team3\\ToDoApp_team3.csproj",
+      "projectUniqueName": "C:\\Users\\tochi\\source\\repos\\Team3_ToDoApp\\ToDoApp_team3\\ToDoApp_team3.csproj",
       "projectName": "ToDoApp_team3",
-      "projectPath": "C:\\Users\\Shibuyayuki\\Desktop\\ToDoApp_team3\\ToDoApp_team3.csproj",
-      "packagesPath": "C:\\Users\\Shibuyayuki\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Shibuyayuki\\Desktop\\ToDoApp_team3\\obj\\",
+      "projectPath": "C:\\Users\\tochi\\source\\repos\\Team3_ToDoApp\\ToDoApp_team3\\ToDoApp_team3.csproj",
+      "packagesPath": "C:\\Users\\tochi\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\tochi\\source\\repos\\Team3_ToDoApp\\ToDoApp_team3\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\Shibuyayuki\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\tochi\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],

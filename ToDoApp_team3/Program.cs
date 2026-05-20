@@ -1,7 +1,17 @@
+using ToDoApp_team3.Model;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+
+// ===== カスタム始まり =====
+
+// TaskDataEditorをITaskDataEditorの実装として登録する
+// AddScoped：１回分のhttpリクエスト→レスポンスまでの間で存在させる
+builder.Services.AddScoped<ITaskDataEditor, TaskDataEditor>();
+
+// ===== カスタム終わり =====
 
 var app = builder.Build();
 

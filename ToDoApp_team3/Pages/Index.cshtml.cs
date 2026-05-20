@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Reflection.Metadata.Ecma335;
 using ToDoApp_team3.Model;
 
 namespace ToDoApp_team3.Pages
@@ -14,68 +15,87 @@ namespace ToDoApp_team3.Pages
         public IndexModel(ITaskDataEditor dataEditor)
         {
             _dataEditor = dataEditor;
+
         }
 
 
 
-        [BindProperty(SupportsGet = true)]
-        public string FilterName { get; set; }
+        //[BindProperty]
+        //public string FilterName { get; set; }
 
-        [BindProperty(SupportsGet = true)]
+        [BindProperty]
         public int SelectedId { get; set; }
 
-        public List<ToDoApp_team3.Model.Tasks> TaskList { get; set; } = new ();
-        public List<Priorities> PriorityList { get; set; }= new ();
+        public List<ToDoApp_team3.Model.Tasks> TaskList { get; set; } = [];
+        public List<Priorities> PriorityList { get; set; }= [];
 
-        public List<(int id, string name)> ItemList { get; set; } = new();
+        public record Filters(ListFilterMode ListFilter,string FilterName);
 
-        public DateTime DeadlineAt => DateTime.Now;
 
-        public void OnGet()
+        public List<Filters> FilterList { get; } = [
+            new Filters(ListFilterMode.Continue, "未完了"),
+            new Filters(ListFilterMode.Complete, "完了"),
+            new Filters(ListFilterMode.All, "すべて")];
+
+        [BindProperty]
+        public int FilterNumber { get; set; } = 0;
+        //public List<(int id, string name)> ItemList { get; set; } = [];
+
+        //public DateTime DeadlineAt => DateTime.Now;
+
+        public void OnGet(int filterNumber)
         {
-            FilterName ??= "Continue";
+            //for (int i = 1; i <= 10; i++)
+            //{
+            //    ItemList.Add((i, $"ID：{i}のタスク"));
+            //}
 
-            TaskList = _dataEditor.GetTaskList(ListFilterMode.Continue);
+            // フィルターの設定
+            ListFilterMode filterMode = FilterList[filterNumber].ListFilter;
+            // タスクリストの取得
+            TaskList = _dataEditor.GetTaskList(filterMode);
 
-            PriorityList = _dataEditor.PriorityList;
+            //
+            PriorityList = [.._dataEditor.PriorityList];
+
+
         }
 
-        public void OnGetFiltering(string filterName)
-        {
-            // 現在のフィルター状態を保持
-            FilterName = filterName;
+        //public void OnGetFiltering(string filterName)
+        //{
+        //    // 現在のフィルター状態を保持
+        //    FilterName = filterName;
 
-            // フィルターに応じて一覧取得
-            TaskList = filterName switch
-            {
-                "Continue" => _dataEditor.GetTaskList(ListFilterMode.Continue),
-                "Complete" => _dataEditor.GetTaskList(ListFilterMode.Complete),
-                "All" => _dataEditor.GetTaskList(ListFilterMode.All)
-            };
+        //    // フィルターに応じて一覧取得
+        //    //TaskList = filterName switch
+        //    //{
+        //    //    "Continue" => _dataEditor.GetTaskList(ListFilterMode.Continue),
+        //    //    "Complete" => _dataEditor.GetTaskList(ListFilterMode.Complete),
+        //    //    "All" => _dataEditor.GetTaskList(ListFilterMode.All)
+        //    //};
 
-            // 優先度一覧も再取得
-            PriorityList = _dataEditor.PriorityList;
-        }
+        //    // 優先度一覧も再取得
+        //    //PriorityList = _dataEditor.PriorityList;
+        //}
 
         public IActionResult OnPostDelete(int selectedId)
         {
-            // 対象タスク取得
-            var task = _dataEditor.GetTask(selectedId);
 
-            // タスクが存在しない場合
-            if (task == null)
+
+
+            try
             {
-                return RedirectToPage("Index");
+                _dataEditor.Delete(selectedId);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                return BadRequest("無効なIDです");
             }
 
-            // 論理削除
-            task.DeletedAt = DateTime.Now;
-
-            // 更新
-            _dataEditor.Update(task);
 
             // フィルター状態を維持して戻る
-            return RedirectToPage("Index", new { filterName = FilterName });
+            return RedirectToPage("Index", new {});
         }
 
         public IActionResult OnPostComplete(int SelectedId)

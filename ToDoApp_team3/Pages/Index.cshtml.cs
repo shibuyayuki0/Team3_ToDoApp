@@ -58,7 +58,21 @@ namespace ToDoApp_team3.Pages
             //
             PriorityList = [.._dataEditor.PriorityList];
 
+        }
 
+        public IActionResult OnGetDetail(int id)
+        {
+                 _dataEditor.GetTaskList(ListFilterMode.All)
+                .Where(x => x.TaskId == id)
+                .Select(x => new
+                {
+                    taskName = x.TaskName,
+                    deadlineAt = x.DeadlineAt,
+                    contentText = x.ContentText
+                })
+                .FirstOrDefault();
+
+            return new JsonResult(TaskList);
         }
 
         //public void OnGetFiltering(string filterName)
@@ -78,45 +92,34 @@ namespace ToDoApp_team3.Pages
         //    //PriorityList = _dataEditor.PriorityList;
         //}
 
-        public IActionResult OnPostDelete(int selectedId)
-        {
+   
+
+        //public IActionResult OnPostComplete(int SelectedId)
+        //{
+        //    try
+        //    {
+        //
+        //    }
+        //    catch
+        //    {
+        //
+        //    }var task = _dataEditor.GetTask(SelectedId);
+
+        //    if(task == null)
+        //    {
+        //        // 指定した別のページへ（index）画面を切り替える
+        //        return RedirectToPage("Index");
+        //    }
+
+        //    task.CompletedAt = DateTime.Now;
+
+        //    _dataEditor.Update(task);
 
 
-
-            try
-            {
-                _dataEditor.Delete(selectedId);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                System.Diagnostics.Debug.WriteLine(ex.Message);
-                return NotFound("無効なIDです");
-            }
-
-
-            // フィルター状態を維持して戻る
-            return RedirectToPage("Index", new {FilterNumber});
-        }
-
-        public IActionResult OnPostComplete(int SelectedId)
-        {
-            var task = _dataEditor.GetTask(SelectedId);
-
-            if(task == null)
-            {
-                // 指定した別のページへ（index）画面を切り替える
-                return RedirectToPage("Index");
-            }
-
-            task.CompletedAt = DateTime.Now;
-
-            _dataEditor.Update(task);
-
-
-            // RedirectToPage("Index",...)同じフォルダ内にあるIndexページへ画面を移動
-            // new { filterName = FilterName }移動先に引き継ぎたいデータの指定
-            // 左側の filterNameはURLに表示されるパラメータ名、右側の FilterName が現在のページで保持している変数の値です。
-            return RedirectToPage("Index", new { filterName = FilterName });
-        }
+        //    // RedirectToPage("Index",...)同じフォルダ内にあるIndexページへ画面を移動
+        //    // new { filterName = FilterName }移動先に引き継ぎたいデータの指定
+        //    // 左側の filterNameはURLに表示されるパラメータ名、右側の FilterName が現在のページで保持している変数の値です。
+        //    return RedirectToPage("Index", new { FilterNumber });
+        //}
     }
 }

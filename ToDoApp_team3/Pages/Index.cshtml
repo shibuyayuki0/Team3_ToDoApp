@@ -16,13 +16,18 @@
             <div class="col-5">タスク名</div>
             <div class="col">締切日</div>
             <!-- フィルタリスト -->
-            <div class="col d-flex justify-content-end align-items-center">
-                <span>フィルター：</span>
-                <select class="d-inline-block">
-                    <option value="">未完了</option>
-                    <option value="">完了</option>
-                    <option value="">すべて</option>
-                </select>
+            <div class="d-flex justify-content-end">
+                <form method="get" class="input-group w-auto">
+                    <span class="input-group-text">
+                        フィルター：</span>
+                    <select name="filterNumber" class="form-select" onchange="this.form.submit()">
+
+                        <option value="Continue">未完了</option>
+                        <option value="Complete">完了</option>
+                        <option value="All">すべて</option>
+
+                    </select>
+                </form>
             </div>
         </div>
     </div>
@@ -84,6 +89,17 @@
             }
         }
 
+        .priority-1{
+            background-color: red;
+        }
+        .priority-2 {
+            background-color: orange;
+        }
+
+        .priority-3 {
+            background-color: royalblue;
+        }
+
         @@keyframes slideInRight {
             from {
                 transform: translateX(100%);
@@ -116,6 +132,13 @@
             // [data-id]属性をもっていれば処理
             const targetTask = e.target.closest('[data-id]');
             if (targetTask){
+                const data = {
+                    priorityId: targetTask.dataset.priorityId,
+                    taskName: targetTask.dataset.taskName,
+                    deadlineAt: targetTask.dataset.deadlineAt,
+                    contentText: targetTask.dataset.contentText
+                };
+
                 overlay.classList.add("active"); // 暗転
                 detailMenu.classList.add("active"); // 詳細メニュー表示
                 setDetailMenu(targetTask.getAttribute("data-id"));// 詳細メニューの値設定
@@ -154,6 +177,11 @@
             });
         });
 
+        // const filters = @Model.FilterList
+
+        const selectedId = @Model.SelectedId
+
+
     </script>
 }
 
@@ -161,8 +189,10 @@
 <div class="container">
     <!-- タスクリスト本体 -->
     <div class="row">
-        @foreach (var item in Model.ItemList)
+        @foreach (var item in Model.TaskList)
         {
+            //PriorityIdを元にCSSクラス名（priority-1など）を作っている
+            var priorityClass = $"priority-{item.PriorityId}";
             <!-- タスク1件 -->
             <div class="col-12 d-flex gap-3">
                 <!-- 警告表示 -->
@@ -170,14 +200,20 @@
                     <span style="font-size:3rem;">&#x26A0;&#xFE0F;</span>
                 </div>
                 <!-- タスク本体 -->
-                <div data-id="@item.id" class="flex-fill border rounded-3 p-4 mb-3 bg-primary-subtle text-primary-emphasis border-secondary-subtle">
+                <div data-id="@item.TaskId" class="flex-fill border rounded-3 p-4 mb-3 @priorityClass">
                     <div class="container align-items-center">
                         <div class="row">
-                            <form method="post" class="col-1">
-                                <button type="submit" ata-without="true" class="btn shadow-none border border-secondary" style="width:2rem; height:2rem; z-index:1000"></button>
+                            <form method="post" asp-page-handler="Complete" class="col-1">
+                                <input type="hidden" name="IsCompleted" value="false" />
+
+                                <input type="checkbox"
+                                       name="IsCompleted"
+                                       value="true"
+                                       class="form-check-input"
+                                       onchange="this.form.submit()" />
                             </form>
-                            <div class="col">@item.name</div>
-                            <div class="col">@Model.DeadlineAt</div>
+                            <div class="col">@item.TaskName</div>
+                            @item.TaskName
                         </div>
                     </div>
                 </div>
@@ -192,7 +228,24 @@
 
 <!-- 右表示メニュー -->
 <div id="detail-menu" class="detail-menu">
+
     <div id="target-id"></div>
+    <div data-id="priorityId"></div>
+    <div data-id="taskName"></div>
+    <div data-id="deadlineAt"></div>
+    <div data-id="contentText"></div>
+    <div></div>
+
+    <div style="display:flex; gap:8px;" class="col-2 text-center">
+        <a href="#" class="btn btn-primary">編集</a>
+        <div></div>
+        <form method="post" asp-page-handler="Delete">
+            <input type="hidden" name="SelectedId" value="@Model.SelectedId" />
+            <button type="submit" class="btn btn-danger">削除</button>
+        </form>
+    </div>
+
+
 </div>
 
 <!-- フロートボタン -->

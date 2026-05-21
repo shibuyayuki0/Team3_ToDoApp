@@ -8,7 +8,7 @@ public interface ITaskDataEditor
     /// <summary>
     /// 優先度を表すリスト
     /// </summary>
-    IReadOnlyList<Priorities> PriorityList { get; }
+    List<Priorities> PriorityList { get; }
 
     /// <summary>
     /// タスクを1件追加する

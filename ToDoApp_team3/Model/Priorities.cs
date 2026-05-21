@@ -8,5 +8,5 @@
 public record Priorities
 (
     int PriorityId,
-    string ProprotyName
+    string PriorityName
 );

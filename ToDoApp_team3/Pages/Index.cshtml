@@ -119,9 +119,10 @@
     <script>
         const overlay = document.getElementById("overlay");
         const detailMenu = document.getElementById("detail-menu");
-        const targetId = document.getElementById("target-id");
 
-        // 1.暗転+詳細メニュー表示
+        let targetTaskId; // 削除や編集を行う対象タスク
+
+        // 1.クリック時の処理
         document.addEventListener("click", (e) => {
 
             // ボタンだった時はスキップ
@@ -132,6 +133,10 @@
             // [data-id]属性をもっていれば処理
             const targetTask = e.target.closest('[data-id]');
             if (targetTask){
+                targetTaskId = targetTask.getAttribute("data-id");
+
+
+
                 // const data = {
                 //     priorityId: targetTask.dataset.priorityId,
                 //     taskName: targetTask.dataset.taskName,
@@ -139,10 +144,25 @@
                 //     contentText: targetTask.dataset.contentText
                 // };
 
+
+
                 overlay.classList.add("active"); // 暗転
                 detailMenu.classList.add("active"); // 詳細メニュー表示
-                setDetailMenu(targetTask.getAttribute("data-id"));// 詳細メニューの値設定
+
+                setDetailMenu(targetTaskId);// 詳細メニューの値設定
                 return;
+            }
+
+            // 削除ボタンが押されたら
+            const deleteBtn = e.target.closest('#menu-delete-btn');
+            if (deleteBtn){
+                const deleteForm = document.getElementById('delete-form');
+
+                // ハンドラーとIDを指定するURLクエリを追加
+                deleteForm.action = `?handler=delete&id=${targetTaskId}`;
+
+                // submit
+                deleteForm.submit();
             }
             
             // 右クリックメニュー以外がクリックされたら
@@ -156,7 +176,7 @@
 
         // 2.詳細メニューの値設定
         const setDetailMenu = (id) => {
-            targetId.textContent = id;
+            targetTaskId.textContent = id;
 
 
 
@@ -169,8 +189,6 @@
 
             editBtn.href = currentHref+'/'+id; 
         };
-
-
 
         // 3.TOPへ戻る
         // A.表示切替
@@ -249,12 +267,13 @@
     <div></div>
 
     <div class="col-2 text-center d-flex gap-3">
+        <!-- 更新ボタン -->
         <div>
             <a asp-page="/ToDoEditor" id="edit-btn" class="btn btn-primary">編集</a>
         </div>
-        <form method="post" asp-page-handler="Delete">
-            <input type="hidden" name="SelectedId" value="@Model.SelectedId" />
-            <button type="submit" class="btn btn-danger">削除</button>
+        <!-- 削除ボタン -->
+        <form method="post" id="delete-form">
+            <button type="button" id="menu-delete-btn" class="btn btn-outline-danger">削除</button>
         </form>
     </div>
 

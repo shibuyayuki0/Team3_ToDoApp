@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 using ToDoApp_team3.Model;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ToDoApp_team3.Pages
 {
@@ -76,6 +75,7 @@ namespace ToDoApp_team3.Pages
         // 登録ボタンの名称
         public string PostButtonName { get; private set; } = "作成";
 
+
         // ===== メソッド =====
         // GET：画面表示
         public IActionResult OnGet(string? id)
@@ -109,7 +109,8 @@ namespace ToDoApp_team3.Pages
                 DeadlineAt = targetTask.DeadlineAt;
                 ContentText = targetTask.ContentText;
 
-                // ボタンの名称を変える
+                // タイトルとボタンの名称を変える
+                FormTitle = "タスクの編集";
                 PostButtonName = "更新";
             }
 

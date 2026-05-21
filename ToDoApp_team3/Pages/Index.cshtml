@@ -175,20 +175,56 @@
         });
 
         // 2.詳細メニューの値設定
-        const setDetailMenu = (id) => {
-            targetTaskId.textContent = id;
+        // const setDetailMenu = (id) => {
+        //     targetTaskId.textContent = id;
 
 
 
 
+        //     const editBtn = document.getElementById('edit-btn');
+
+        //     const currentHref = editBtn.getAttribute('href');
+
+        //     console.log(currentHref);
+        //     console.log('test');
+
+        //     editBtn.href = currentHref+'/'+id; 
+        // };
+
+         const setDetailMenu = (id) => {
+
+            // ID表示
+            document.getElementById("target-id").textContent = id;
+
+            // 対象タスク取得
+            const task = document.querySelector(`[data-id="${id}"]`);
+
+            // const priorities = @Model.PriorityList
+            const priorities = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.PriorityList));
+            // 詳細表示
+            const priorityMap = new Map(
+                priorities.map(p => [p.id, p.priorityName])
+            );
+
+
+            document.getElementById("priorityId").textContent =
+                priorityMap.get(Number(task.dataset.priorityid)) ?? "" ;
+
+            document.getElementById("taskName").textContent =
+                task.dataset.taskname;
+
+            document.getElementById("deadlineAt").textContent =
+                task.dataset.deadlineat;
+
+            document.getElementById("contentText").textContent =
+                task.dataset.contenttext;
+
+            // 編集ボタン
             const editBtn = document.getElementById('edit-btn');
 
             const currentHref = editBtn.getAttribute('href');
 
-            console.log(currentHref);
-            console.log('test');
-
-            editBtn.href = currentHref+'/'+id; 
+            editBtn.href = currentHref + '/' + id;
         };
 
         // 3.TOPへ戻る
@@ -231,7 +267,12 @@
                     <span style="font-size:3rem;">&#x26A0;&#xFE0F;</span>
                 </div>
                 <!-- タスク本体 -->
-                <div data-id="@item.TaskId" class="flex-fill border rounded-3 p-4 mb-3 @priorityClass">
+                <div data-id="@item.TaskId"
+                     data-priorityid="@item.PriorityId"
+                     data-taskname="@item.TaskName"
+                     data-deadlineat="@item.DeadlineAt"
+                     data-contenttext="@item.ContentText"
+                     class="flex-fill border rounded-3 p-4 mb-3 @priorityClass">
                     <div class="container align-items-center">
                         <div class="row">
                             <form method="post" asp-page-handler="Complete" class="col-1">
@@ -244,7 +285,7 @@
                                        onchange="this.form.submit()" />
                             </form>
                             <div class="col">@item.TaskName</div>
-                            @item.TaskName
+                            <div class="col">@item.DeadlineAt.ToString("yyyy/MM/dd")</div>
                         </div>
                     </div>
                 </div>
@@ -261,10 +302,10 @@
 <div id="detail-menu" class="detail-menu">
 
     <div id="target-id"></div>
-    <div data-id="priorityId"></div>
-    <div data-id="taskName"></div>
-    <div data-id="deadlineAt"></div>
-    <div data-id="contentText"></div>
+    <div id="priorityMap"></div>
+    <div id="taskName"></div>
+    <div id="deadlineAt"></div>
+    <div id="contentText"></div>
     <div></div>
 
     <div class="col-2 text-center d-flex gap-3">

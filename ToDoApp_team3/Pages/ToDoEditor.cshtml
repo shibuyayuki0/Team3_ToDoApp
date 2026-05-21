@@ -42,6 +42,8 @@
         <div class="row text-center">
             <!-- 作成/更新ボタン -->
             <div class="col-6">
+                <input type="hidden" asp-for="FormTitle" />
+                <input type="hidden" asp-for="PostButtonName" />
                 <button type="submit" class="btn btn-primary">@Model.PostButtonName</button>
             </div>
             <!-- キャンセルボタン -->

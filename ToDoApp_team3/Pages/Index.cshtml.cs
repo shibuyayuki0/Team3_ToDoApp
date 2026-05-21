@@ -76,6 +76,21 @@ namespace ToDoApp_team3.Pages
         }
 
 
+        public IActionResult OnPostDelete(int? id)
+        {
+            // id存在確認
+            if (!id.HasValue || _dataEditor.GetTask(id.Value) is null)
+            {
+                return BadRequest("無効なIDが渡されました。");
+            }
+
+            // 削除処理
+            _dataEditor.Delete(id.Value);
+
+            // インデックスに戻る
+            return RedirectToPage();
+        }
+
 
 
         //public void OnGetFiltering(string filterName)

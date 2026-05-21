@@ -121,31 +121,31 @@
         const detailMenu = document.getElementById("detail-menu");
         const targetId = document.getElementById("target-id");
 
-        // 1.暗転+詳細メニュー表示
-        document.addEventListener("click", (e) => {
+        // // 1.暗転+詳細メニュー表示
+        // document.addEventListener("click", (e) => {
 
-            // ボタンだった時はスキップ
-            if (e.target.closest('[data-without="true"]')) {
-                return;
-            }
+        //     // ボタンだった時はスキップ
+        //     if (e.target.closest('[data-without="true"]')) {
+        //         return;
+        //     }
 
-            // [data-id]属性をもっていれば処理
-            const targetTask = e.target.closest('[data-id]');
-            if (targetTask){
-                overlay.classList.add("active"); // 暗転
-                detailMenu.classList.add("active"); // 詳細メニュー表示
-                setDetailMenu(targetTask.getAttribute("data-id"));// 詳細メニューの値設定
-                return;
-            }
+        //     // [data-id]属性をもっていれば処理
+        //     const targetTask = e.target.closest('[data-id]');
+        //     if (targetTask){
+        //         overlay.classList.add("active"); // 暗転
+        //         detailMenu.classList.add("active"); // 詳細メニュー表示
+        //         setDetailMenu(targetTask.getAttribute("data-id"));// 詳細メニューの値設定
+        //         return;
+        //     }
             
-            // 右クリックメニュー以外がクリックされたら
-            if (!e.target.closest('#detail-menu')){
-                overlay.classList.remove("active"); // 暗転解除
-                detailMenu.classList.remove("active"); // 詳細メニュー解除
-                return;
-            }
+        //     // 右クリックメニュー以外がクリックされたら
+        //     if (!e.target.closest('#detail-menu')){
+        //         overlay.classList.remove("active"); // 暗転解除
+        //         detailMenu.classList.remove("active"); // 詳細メニュー解除
+        //         return;
+        //     }
 
-        });
+        // });
 
         // 2.詳細メニューの値設定
         const setDetailMenu = (id) => {

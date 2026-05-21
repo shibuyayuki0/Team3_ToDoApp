@@ -90,7 +90,7 @@ namespace ToDoApp_team3.Pages
             catch (KeyNotFoundException ex)
             {
                 System.Diagnostics.Debug.WriteLine(ex.Message);
-                return BadRequest("無効なIDです");
+                return NotFound("無効なIDです");
             }
 
 

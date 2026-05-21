@@ -11,7 +11,7 @@
         <div class="row align-items-center">
             <!-- 作成ボタン -->
             <div class="col-2 text-center">
-                <a href="#" class="btn btn-primary">作成</a>
+                <a asp-page="/ToDoEditor" class="btn btn-primary">作成</a>
             </div>
             <div class="col-5">タスク名</div>
             <div class="col">締切日</div>
@@ -132,12 +132,12 @@
             // [data-id]属性をもっていれば処理
             const targetTask = e.target.closest('[data-id]');
             if (targetTask){
-                const data = {
-                    priorityId: targetTask.dataset.priorityId,
-                    taskName: targetTask.dataset.taskName,
-                    deadlineAt: targetTask.dataset.deadlineAt,
-                    contentText: targetTask.dataset.contentText
-                };
+                // const data = {
+                //     priorityId: targetTask.dataset.priorityId,
+                //     taskName: targetTask.dataset.taskName,
+                //     deadlineAt: targetTask.dataset.deadlineAt,
+                //     contentText: targetTask.dataset.contentText
+                // };
 
                 overlay.classList.add("active"); // 暗転
                 detailMenu.classList.add("active"); // 詳細メニュー表示
@@ -157,7 +157,19 @@
         // 2.詳細メニューの値設定
         const setDetailMenu = (id) => {
             targetId.textContent = id;
+
+
+
+            const editBtn = document.getElementById('edit-btn');
+
+            const currentHref = editBtn.getAttribute('href');
+
+            console.log(currentHref);
+            console.log('test');
+
+            editBtn.href = currentHref+'/'+id; 
         };
+
 
 
         // 3.TOPへ戻る
@@ -236,9 +248,10 @@
     <div data-id="contentText"></div>
     <div></div>
 
-    <div style="display:flex; gap:8px;" class="col-2 text-center">
-        <a href="#" class="btn btn-primary">編集</a>
-        <div></div>
+    <div class="col-2 text-center d-flex gap-3">
+        <div>
+            <a asp-page="/ToDoEditor" id="edit-btn" class="btn btn-primary">編集</a>
+        </div>
         <form method="post" asp-page-handler="Delete">
             <input type="hidden" name="SelectedId" value="@Model.SelectedId" />
             <button type="submit" class="btn btn-danger">削除</button>

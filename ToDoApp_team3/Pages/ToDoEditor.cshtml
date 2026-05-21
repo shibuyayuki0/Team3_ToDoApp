@@ -1,54 +1,53 @@
-﻿@page "{id:int?}"
+﻿@page "/edit/{id?}"
 @model ToDoEditorModel
 @{
     ViewData["Title"] = "Edit";
 }
 
-<!-- 空データ -->
-@if (Model.TargetTaskId.HasValue)
-{
-    <h1>編集</h1>
-}
-else
-{
-    <h1>新規作成</h1>
-}
+<div class="container my-5">
+    <form method="post">
+        <h1 class="text-center mb-5">@Model.FormTitle</h1>
 
-<form method="post">
-
-    <div>
-        タスク名：
-        <input type="text" asp-for="TaskName" />
-    </div>
-
-    <br />
-
-    <div>
-        優先度：
- </div>
-
-    <br />
-
-    <div>
-        締切日：
-        <input type="date" asp-for="DeadlineAt" />
-    </div>
-
-    <br />
-
-    <div>
-        詳細内容：
-        <textarea asp-for="ContentText"></textarea>
-    </div>
-
-    <br />
-
-    <button type="submit">
-        更新
-    </button>
-
-    <a asp-page="Index">
-        キャンセル
-    </a>
-
-</form>
+        <!-- タスク名 -->
+        <div class="row mb-3">
+            <label asp-for="TaskName" class="col-2 col-form-label"></label>
+            <div class="col-10">
+                <input type="text" asp-for="TaskName" class="form-control" />
+                <span asp-validation-for="TaskName" class="text-danger"></span>
+            </div>
+        </div>
+        <!-- 重要度 -->
+        <div class="row mb-3">
+            <label asp-for="SelectedPriority" class="col-2 col-form-label"></label>
+            <div class="col-10">
+                <select asp-for="SelectedPriority" asp-items="@Model.Options" class="form-select"></select>
+            </div>
+        </div>
+        <!-- 期限 -->
+        <div class="row mb-3">
+            <label asp-for="DeadlineAt" class="col-2 col-form-label"></label>
+            <div class="col-10">
+                <input type="date" asp-for="DeadlineAt" class="form-control" />
+                <span asp-validation-for="DeadlineAt" class="text-danger"></span>
+            </div>
+        </div>
+        <!-- 詳細内容 -->
+        <div class="row mb-3">
+            <label asp-for="ContentText" class="col-2 col-form-label"></label>
+            <div class="col-10">
+                <textarea asp-for="ContentText" class="form-control" rows="5"></textarea>
+            </div>
+        </div>
+        <!-- ボタン関連 -->
+        <div class="row text-center">
+            <!-- 作成/更新ボタン -->
+            <div class="col-6">
+                <button type="submit" class="btn btn-primary">@Model.PostButtonName</button>
+            </div>
+            <!-- キャンセルボタン -->
+            <div class="col">
+                <a asp-page="/Index" class="btn btn-outline-danger">キャンセル</a>
+            </div>
+        </div>
+    </form>
+</div>

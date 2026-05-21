@@ -31,7 +31,7 @@ namespace ToDoApp_team3.Pages
 
         public record Filters(ListFilterMode ListFilter,string FilterName);
 
-
+        
         public List<Filters> FilterList { get; } = [
             new Filters(ListFilterMode.Continue, "未完了"),
             new Filters(ListFilterMode.Complete, "完了"),

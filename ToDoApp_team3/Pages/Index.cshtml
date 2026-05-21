@@ -132,13 +132,7 @@
             // [data-id]属性をもっていれば処理
             const targetTask = e.target.closest('[data-id]');
             if (targetTask){
-                const data = {
-                    priorityId: targetTask.dataset.priorityId,
-                    taskName: targetTask.dataset.taskName,
-                    deadlineAt: targetTask.dataset.deadlineAt,
-                    contentText: targetTask.dataset.contentText
-                };
-
+               
                 overlay.classList.add("active"); // 暗転
                 detailMenu.classList.add("active"); // 詳細メニュー表示
                 setDetailMenu(targetTask.getAttribute("data-id"));// 詳細メニューの値設定
@@ -154,7 +148,7 @@
 
         });
 
-        // 2.詳細メニューの値設定
+        //2.詳細メニューの値設定
         const setDetailMenu = (id) => {
             targetId.textContent = id;
 
@@ -170,6 +164,37 @@
 
             editBtn.href = currentHref+'/'+id; 
         };
+        
+        // const setDetailMenu = (task) => {
+
+        //     data属性取得
+        //     const id = task.dataset.id;
+        //     const priority = task.dataset.priorityid;
+        //     const name = task.dataset.taskname;
+        //     const deadline = task.dataset.deadlineat;
+        //     const content = task.dataset.contenttext;
+
+        //     詳細メニュー表示
+        //     targetId.textContent = `ID : ${id}`;
+
+        //     document.getElementById("priorityId").textContent =
+        //         `優先度 : ${priority}`;
+
+        //     document.getElementById("taskName").textContent =
+        //         `タスク名 : ${name}`;
+
+        //     document.getElementById("deadlineAt").textContent =
+        //         `締切日 : ${deadline}`;
+
+        //     document.getElementById("contentText").textContent =
+        //         `内容 : ${content}`;
+
+        //     編集ボタン
+        //     const editBtn = document.getElementById('edit-btn');
+
+        //     毎回リセット
+        //     editBtn.href = `/ToDoEditor/${id}`;
+        // };
 
 
 
@@ -213,7 +238,12 @@
                     <span style="font-size:3rem;">&#x26A0;&#xFE0F;</span>
                 </div>
                 <!-- タスク本体 -->
-                <div data-id="@item.TaskId" class="flex-fill border rounded-3 p-4 mb-3 @priorityClass">
+                <div data-id="@item.TaskId" 
+                     data-priorityid="@item.PriorityId"
+                     data-taskname="@item.TaskName"
+                     data-deadlineat="@item.DeadlineAt"
+                     data-contenttext="@item.ContentText"
+                     class="flex-fill border rounded-3 p-4 mb-3 @priorityClass">
                     <div class="container align-items-center">
                         <div class="row">
                             <form method="post" asp-page-handler="Complete" class="col-1">
@@ -243,10 +273,10 @@
 <div id="detail-menu" class="detail-menu">
 
     <div id="target-id"></div>
-    <div data-id="priorityId"></div>
-    <div data-id="taskName"></div>
-    <div data-id="deadlineAt"></div>
-    <div data-id="contentText"></div>
+    <div id="priorityId"></div>
+    <div id="taskName"></div>
+    <div id="deadlineAt"></div>
+    <div id="contentText"></div>
     <div></div>
 
     <div class="col-2 text-center d-flex gap-3">

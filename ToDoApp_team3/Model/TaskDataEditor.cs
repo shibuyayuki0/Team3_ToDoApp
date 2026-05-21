@@ -23,7 +23,8 @@ public class TaskDataEditor : ITaskDataEditor
 
     // ===== プロパティ =====
     // 優先度リスト
-    public IReadOnlyList<Priorities> PriorityList { get; }
+    // 一度作成したら使いまわすので、読取専用プロパティとしてコンストラクタで設定しておく
+    public List<Priorities> PriorityList { get; }
 
     // ===== コマンド =====
     // タスクの追加

@@ -95,7 +95,7 @@ namespace ToDoApp_team3.Pages
 
 
             // フィルター状態を維持して戻る
-            return RedirectToPage("Index", new {});
+            return RedirectToPage("Index", new {FilterNumber});
         }
 
         public IActionResult OnPostComplete(int SelectedId)

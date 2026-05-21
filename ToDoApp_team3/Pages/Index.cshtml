@@ -13,20 +13,14 @@
             <div class="col-2 text-center">
                 <a asp-page="/ToDoEditor" class="btn btn-primary">作成</a>
             </div>
+            <!-- 項目名 -->
             <div class="col-5">タスク名</div>
-            <div class="col">締切日</div>
+            <div class="col">期限</div>
             <!-- フィルタリスト -->
-            <div class="d-flex justify-content-end">
+            <div class="col d-flex justify-content-end">
                 <form method="get" class="input-group w-auto">
-                    <span class="input-group-text">
-                        フィルター：</span>
-                    <select name="filterNumber" class="form-select" onchange="this.form.submit()">
-
-                        <option value="Continue">未完了</option>
-                        <option value="Complete">完了</option>
-                        <option value="All">すべて</option>
-
-                    </select>
+                    <span class="input-group-text">フィルター：</span>
+                    <select asp-for="SelectedFilter" asp-items="@Model.FilterList" class="form-select" onchange="this.form.submit()"></select>
                 </form>
             </div>
         </div>

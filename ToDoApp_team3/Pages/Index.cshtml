@@ -132,12 +132,12 @@
             // [data-id]属性をもっていれば処理
             const targetTask = e.target.closest('[data-id]');
             if (targetTask){
-                // const data = {
-                //     priorityId: targetTask.dataset.priorityId,
-                //     taskName: targetTask.dataset.taskName,
-                //     deadlineAt: targetTask.dataset.deadlineAt,
-                //     contentText: targetTask.dataset.contentText
-                // };
+                const data = {
+                    priorityId: targetTask.dataset.priorityId,
+                    taskName: targetTask.dataset.taskName,
+                    deadlineAt: targetTask.dataset.deadlineAt,
+                    contentText: targetTask.dataset.contentText
+                };
 
                 overlay.classList.add("active"); // 暗転
                 detailMenu.classList.add("active"); // 詳細メニュー表示
@@ -157,6 +157,7 @@
         // 2.詳細メニューの値設定
         const setDetailMenu = (id) => {
             targetId.textContent = id;
+
 
 
 

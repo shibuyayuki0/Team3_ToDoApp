@@ -60,20 +60,6 @@ namespace ToDoApp_team3.Pages
 
         }
 
-        public IActionResult OnGetDetail(int id)
-        {
-                 _dataEditor.GetTaskList(ListFilterMode.All)
-                .Where(x => x.TaskId == id)
-                .Select(x => new
-                {
-                    taskName = x.TaskName,
-                    deadlineAt = x.DeadlineAt,
-                    contentText = x.ContentText
-                })
-                .FirstOrDefault();
-
-            return new JsonResult(TaskList);
-        }
 
 
         public IActionResult OnPostDelete(int? id)

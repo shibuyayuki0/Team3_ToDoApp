@@ -5,30 +5,36 @@
 /// </summary>
 public interface ITaskDataEditor
 {
-    /// <summary>
-    /// 優先度を表すリスト
-    /// </summary>
-    List<Priorities> PriorityList { get; }
+    // ===== クエリ（参照系） =====
 
     /// <summary>
-    /// タスクを1件追加する
+    /// 優先度リストの取得
     /// </summary>
-    /// <param name="newTask">追加したいタスク</param>
-    void Add(Tasks newTask);
+    /// <returns>優先度リスト</returns>
+    Task<List<Priorities>> GetPriorityListAsync();
 
     /// <summary>
     /// タスクの一覧を取得する
     /// </summary>
     /// <param name="mode">取得するモード（未完了・完了・すべて）</param>
     /// <returns>タスクの一覧リスト</returns>
-    List<Tasks> GetTaskList(ListFilterMode mode);
+    Task<List<Tasks>> GetTaskListAsync(ListFilterMode mode);
 
     /// <summary>
     /// 指定したタスクを取得する
     /// </summary>
     /// <param name="taskId">取得するタスクのID</param>
     /// <returns>タスク1件のデータ、タスクIDが存在しない場合はNULL</returns>
-    Tasks? GetTask(int taskId);
+    Task<Tasks?> GetTaskAsync(int taskId);
+
+
+    // ===== コマンド（書き込み系） =====
+
+    /// <summary>
+    /// タスクを1件追加する
+    /// </summary>
+    /// <param name="newTask">追加したいタスク</param>
+    Task AddAsync(Tasks newTask);
 
     /// <summary>
     /// タスクの内容を更新する
@@ -37,7 +43,7 @@ public interface ITaskDataEditor
     /// <exception cref="KeyNotFoundException">
     /// 存在しないタスクIDを含む更新タスクが渡されるとスローされる
     /// </exception>
-    void Update(Tasks targetTask);
+    Task UpdateAsync(Tasks targetTask);
 
     /// <summary>
     /// タスクを削除する
@@ -46,5 +52,5 @@ public interface ITaskDataEditor
     /// <exception cref="KeyNotFoundException">
     /// 存在しないタスクIDを指定するとスローされる
     /// </exception>
-    void Delete(int taskId);
+    Task DeleteAsync(int taskId);
 }

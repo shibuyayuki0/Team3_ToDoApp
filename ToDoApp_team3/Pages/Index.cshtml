@@ -4,40 +4,9 @@
     ViewData["Title"] = "Home page";
 }
 
-<!-- ヘッダー追加部品 -->
-@section AdditionalHeader{
-    <div class="container">
-        <!-- タイトル -->
-        <div class="row align-items-center text-nowrap flex-nowrap">
-            <!-- 作成ボタン -->
-            <div class="col-3 col-lg-2 text-center">
-                <a asp-page="/ToDoEditor" class="btn btn-primary">作成</a>
-            </div>
-            <!-- 項目名 -->
-            <div class="col-5 col-lg-4">タスク名</div>
-            <div class="col col-sm">期限</div>
-            <!-- 表示切替フィルタ -->
-            <div class="col-3 col-lg-2 text-end">
-                <form method="get" class="input-group w-auto flex-nowrap">
-                    <label class="input-group-text d-none d-lg-inline-block">表示</label>
-                    <select asp-for="SelectedFilter" asp-items="@Model.FilterList" class="form-select" onchange="this.form.submit()"></select>
-                </form>
-            </div>
-        </div>
-    </div>
-}
-
 <!-- Style -->
 @section Styles {
     <style>
-
-        .delay-mark{
-            visibility: hidden;
-            &.active {
-                visibility: visible;
-            }
-        }
-
         .completed-task {
             background-color: var(--bs-tertiary-color);
             color: var(--bs-secondary-color);
@@ -48,6 +17,8 @@
             background-color: var(--bs-danger-bg-subtle);
             color: var(--bs-danger-text-emphasis);
             border: 2px solid var(--bs-danger-border-subtle);
+
+
         }
 
         .priority-2 {
@@ -62,7 +33,48 @@
             border: 2px solid var(--bs-success-border-subtle);
         }
 
+        .custom-strike {
+            &::before {
+                content: "";
+                position: absolute;
+                top: 50%;
+                left: 70px;
+                right: 0;
+                height: 0;
+                border-top: 2px solid var(--bs-tertiary-color);
+                transform: translateY(-3.5rem);
+            }
+        }
 
+        @@media(min-width:576px) {
+            .custom-strike::before {
+                left: 75px;
+            }
+        }
+
+        @@media(min-width:768px) {
+            .custom-strike::before {
+                left: 50px;
+            }
+        }
+
+        @@media(min-width:992px) {
+            .custom-strike::before {
+                left: 70px;
+            }
+        }
+
+        @@media(min-width:1200px) {
+            .custom-strike::before {
+                left: 85px;
+            }
+        }
+
+        @@media(min-width:1400px) {
+            .custom-strike::before {
+                left: 100px;
+            }
+        }
 
         .return-button {
             opacity: 0;
@@ -91,6 +103,11 @@
                 opacity: 1;
                 visibility: visible;
             }
+        }
+
+        .btn-complete{
+            width: 2rem;
+            height: 2rem;
         }
 
         .detail-menu {
@@ -150,8 +167,8 @@
         // 1.クリック時の処理
         document.addEventListener("click", (e) => {
 
-            // ボタンだった時はスキップ
-            if (e.target.closest('[data-without]')) {
+            // click-withoutだった時はスキップ
+            if (e.target.closest('[click-without]')) {
                 return;
             }
 
@@ -283,60 +300,86 @@
     </script>
 }
 
-<!-- 本体 -->
+
+<!-- ヘッダーパーツ -->
+@section AdditionalHeader {
+    <!-- タスクリスト項目名 -->
+    <div class="d-flex align-items-center">
+        <!-- 作成ボタン -->
+        <div class="col-2 col-md-1 d-inline-block">
+            <a asp-page="/ToDoEditor" class="btn btn-primary">作成</a>
+        </div>
+        <!-- タスク名 -->
+        <div class="col-7 col-md-6 d-inline-block fw-bold">タスク名</div>
+        <!-- 期限 -->
+        <div class="col-2 d-inline-block fw-bold">期限</div>
+        <!-- フィルター -->
+        <div class="col d-inline-block">
+            <form method="get" class="input-group w-auto flex-nowrap">
+                <label class="input-group-text d-none d-lg-inline-block">表示</label>
+                <select asp-for="SelectedFilter" asp-items="@Model.FilterList" class="form-select" onchange="this.form.submit()"></select>
+            </form>
+        </div>
+    </div>
+}
+
+<!-- アプリ本体 -->
 <div class="container">
-    <!-- タスクリスト本体 -->
-    <div class="row">
-        @foreach (var item in Model.TaskList)
+    @foreach (var item in Model.TaskList)
+    {
+        // 各種クラス名
+        string taskColor = ""; // タスクの色
+        string activeMark = ""; // ディレイ表示
+        string activeBorder = ""; // 取り消し線表示
+        // 完了しているか？
+        bool isCompleted = @item.CompletedAt is not null;
+        if (isCompleted)
         {
-            // タスクの色
-            string taskColor = "";
-            string activeMark = "";
-            // 完了しているか？
-            bool isCompleted = @item.CompletedAt is not null;
-            if (isCompleted)
-            {
-                // 完了色に変える
-                taskColor = "completed-task";
-            }
-            else
-            {
-                //PriorityIdを元にCSSクラス名（priority-1など）を作っている
-                taskColor = $"priority-{item.PriorityId}";
-
-                // 本日の日付を超えているか？超えていればディレイマークを付ける
-                var isDelay = item.DeadlineAt.Date < DateTime.Today.Date;
-                activeMark = isDelay ? "active" : "";
-            }
-
-            <!-- タスク1件 -->
-            <div class="col-12 d-flex gap-3">
-                <!-- 警告表示 -->
-                <div class="">
-                    <span class="delay-mark @activeMark" style="font-size:3rem;">&#x26A0;&#xFE0F;</span>
-                </div>
-                <!-- タスク本体 -->
-                <div data-id="@item.TaskId"
-                     data-priorityid="@item.PriorityId"
-                     data-taskname="@item.TaskName"
-                     data-deadlineat="@item.DeadlineAt"
-                     data-contenttext="@item.ContentText"
-                     class="flex-fill border rounded-3 p-4 mb-3 @taskColor">
-                    <div class="container align-items-center">
-                        <div class="row">
-                            <form method="post" asp-page-handler="Complete" asp-route-id="@item.TaskId" class="col-1">
-                                <input type="hidden" asp-for="SelectedFilter" />
-                                <input type="checkbox" checked="@isCompleted" onchange="this.form.submit()" data-without class="" />
-                            </form>
-                            <div class="col">@item.TaskName</div>
-                            <div class="col">@item.DeadlineAt.ToString("yyyy/MM/dd")</div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
+            // 完了色に変える
+            taskColor = "completed-task";
+            // ディレイを消す
+            activeMark = "invisible";
+            // 斜線を表示する
+            activeBorder = "d-block";
         }
-    </div>    
+        else
+        {
+            // 斜線を消す
+            activeBorder = "d-none";
+            //PriorityIdを元にCSSクラス名（priority-1など）を作っている
+            taskColor = $"priority-{item.PriorityId}";
+            // 本日の日付を超えているか？超えていればディレイマークを付ける
+            var isDelay = item.DeadlineAt.Date < DateTime.Today.Date;
+            activeMark = isDelay ? "" : "invisible";
+        }
+
+        <!-- タスク1件 -->
+        <div class="row">
+            <div class="d-flex align-items-center shadow border rounded-3 py-2 mb-3 @taskColor"
+                 data-id="@item.TaskId"
+                 data-priorityid="@item.PriorityId"
+                 data-taskname="@item.TaskName"
+                 data-deadlineat="@item.DeadlineAt"
+                 data-contenttext="@item.ContentText">
+                <!-- チェックボタン -->
+                <form method="post" asp-page-handler="Complete" asp-route-id="@item.TaskId" class="col-2 col-md-1 d-inline-block text-center">
+                    <input type="hidden" asp-for="SelectedFilter" />
+                    <input type="checkbox" checked="@isCompleted" onchange="this.form.submit()" click-without class="btn-complete" />
+                </form>
+                <!-- タスク名 -->
+                <div class="col-6 col-md-5 fw-bold">@item.TaskName</div>
+                <!-- 警告表示 -->
+                <div class="col-1 d-inline-block text-end">
+                    <span class="@activeMark" style="font-size:2.5rem; letter-spacing:0.5rem;">&#x26A0;&#xFE0F;</span>
+                </div>
+                <!-- 期限 -->
+                <div class="col fw-bold">@item.DeadlineAt.ToString("yyyy/MM/dd")</div>
+            </div>
+        </div>
+
+        <!-- 取り消し線（完了時） -->
+        <span class="custom-strike position-relative align-baseline @activeBorder"></span>
+    }  
 </div>
 
 <!-- 暗転オブジェクト -->

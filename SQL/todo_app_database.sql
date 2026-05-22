@@ -16,16 +16,18 @@ GO -- 接続までで一区切り
 -- 優先度を表すマスターテーブル
 -- テーブルの存在チェックを行って無ければ生成する
 -- OBJECT_ID：各オブジェクトの固有IDを取得する、なければNULL
+-- UNIQUE：PK以外で重複を禁止する
 IF OBJECT_ID('priorities', 'U') IS NULL
 BEGIN
 	CREATE TABLE priorities	(
 		priority_id INT IDENTITY(1,1) PRIMARY KEY,
-		priority_name NVARCHAR(1) NOT NULL);
+		priority_name NVARCHAR(1) UNIQUE NOT NULL);
 END
 
 -- タスクを表すテーブル
 IF OBJECT_ID('tasks', 'U') IS NULL
 BEGIN
+	-- テーブル本体
 	CREATE TABLE tasks(
 		id INT IDENTITY(1,1) PRIMARY KEY,
 		task_name NVARCHAR(30) NOT NULL,
@@ -36,14 +38,34 @@ BEGIN
 		created_at DATETIME NOT NULL,
 		deleted_at DATETIME,
 		FOREIGN KEY(priority_id)REFERENCES priorities(priority_id));
+		
+	-- インデックスの作成
+	-- 検索用、deadline_at ASCでソートする際に使用
+	-- deleted_at, completed_atはソート時の条件に含まれるので結合インデックスとして処理
+	CREATE INDEX IX_tasks_deleted_completed_deadline
+	ON tasks (deleted_at, deadline_at ASC, completed_at)
+	INCLUDE (task_name, content_text, priority_id);
 END
 
 
 -- マスターデータの定義
 
 -- 優先度
+-- SELECT～：p.priority_nameをまとめた仮テーブルを作成する
+-- FROM～：priority_nameというキーで高～低という値をもつ
+-- WHERE～：データがないよね？という条件
+-- SELECT 1 FROM～：既存のpriorities中のpriority_nameと今回のpriority_nameが一致するものの一覧
+-- →　まとめて既存のpriority_nameに含まれないなら、追加するという処理
 INSERT INTO priorities(priority_name)
-VALUES (N'高'),(N'中'),(N'低');
+SELECT p.priority_name
+FROM (
+	SELECT N'高' AS [priority_name] UNION ALL
+	SELECT N'中' AS [priority_name] UNION ALL
+	SELECT N'低' AS [priority_name]
+) AS p
+WHERE NOT EXISTS(
+	SELECT 1 FROM priorities p2 WHERE p2.priority_name = p.priority_name
+);
 
 
 -- テスト用データの作成

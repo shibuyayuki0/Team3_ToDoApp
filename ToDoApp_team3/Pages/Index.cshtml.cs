@@ -20,12 +20,11 @@ namespace ToDoApp_team3.Pages
             PriorityList = _dataEditor.PriorityList;
         }
 
-        [BindProperty]
-        public int SelectedId { get; set; }
-
+        // タスクの一覧
         public List<ToDoApp_team3.Model.Tasks> TaskList { get; set; } = [];
-        public List<Priorities> PriorityList { get; set; }= [];
 
+        // 優先度の一覧
+        public List<Priorities> PriorityList { get; set; }= [];
 
         // フィルターリスト
         public List<SelectListItem> FilterList { get; } = [
@@ -61,32 +60,25 @@ namespace ToDoApp_team3.Pages
         }
 
         // === POST：完了 ===
-        //public IActionResult OnPostComplete(int SelectedId)
-        //{
-        //    try
-        //    {
-        //
-        //    }
-        //    catch
-        //    {
-        //
-        //    }var task = _dataEditor.GetTask(SelectedId);
+        public IActionResult OnPostComplete(int id)
+        {
+            var task = _dataEditor.GetTask(id);
+            
+            if (task is null)
+            {
+                return BadRequest("不正な操作を検出しました。");
+            }
 
-        //    if(task == null)
-        //    {
-        //        // 指定した別のページへ（index）画面を切り替える
-        //        return RedirectToPage("Index");
-        //    }
+            // 完了日のトグル処理（未完了なら完了へ、完了なら未完了へ）
+            DateTime? newDate = task.CompletedAt is null ? DateTime.Now : null;
 
-        //    task.CompletedAt = DateTime.Now;
+            // 完了日を更新
+            var newTask = task with { CompletedAt = newDate };
+            _dataEditor.Update(newTask);
 
-        //    _dataEditor.Update(task);
-
-
-        //    // RedirectToPage("Index",...)同じフォルダ内にあるIndexページへ画面を移動
-        //    // new { filterName = FilterName }移動先に引き継ぎたいデータの指定
-        //    // 左側の filterNameはURLに表示されるパラメータ名、右側の FilterName が現在のページで保持している変数の値です。
-        //    return RedirectToPage("Index", new { FilterNumber });
-        //}
+            // RedirectToPage("/Index",...)同じフォルダ内にあるIndexページへ画面を移動
+            // 左側の filterNameはURLに表示されるパラメータ名、右側の FilterName が現在のページで保持している変数の値です。
+            return RedirectToPage("/Index", new { this.SelectedFilter });
+        }
     }
 }

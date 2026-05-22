@@ -166,7 +166,9 @@
 
         // 1.クリック時の処理
         document.addEventListener("click", (e) => {
-
+            // リンク先情報をクリア
+            targetTaskId = "";
+            
             // click-withoutだった時はスキップ
             if (e.target.closest('[click-without]')) {
                 return;

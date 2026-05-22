@@ -135,6 +135,14 @@
         const overlay = document.getElementById("overlay");
         const detailMenu = document.getElementById("detail-menu");
 
+
+        
+        const taskName = document.getElementById("taskName");
+        const priorityId = document.getElementById("priorityId");
+        const deadlineAt = document.getElementById("deadlineAt");
+        const contentText = document.getElementById("contentText");
+
+
         let targetTaskId; // 削除や編集を行う対象タスク
 
         // 1.クリック時の処理
@@ -149,15 +157,6 @@
             const targetTask = e.target.closest('[data-id]');
             if (targetTask){
                 targetTaskId = targetTask.getAttribute("data-id");
-
-
-
-                // const data = {
-                //     priorityId: targetTask.dataset.priorityId,
-                //     taskName: targetTask.dataset.taskName,
-                //     deadlineAt: targetTask.dataset.deadlineAt,
-                //     contentText: targetTask.dataset.contentText
-                // };
 
 
 
@@ -190,57 +189,56 @@
         });
 
         // 2.詳細メニューの値設定
-        // const setDetailMenu = (id) => {
-        //     targetTaskId.textContent = id;
+        const setDetailMenu = (id) => {
+            
+            const targetTaskId = document.getElementById("target-taskid");
+
+            targetTaskId.textContent = id;
 
 
 
 
-        //     const editBtn = document.getElementById('edit-btn');
-
-        //     const currentHref = editBtn.getAttribute('href');
-
-        //     console.log(currentHref);
-        //     console.log('test');
-
-        //     editBtn.href = currentHref+'/'+id; 
-        // };
-
-         const setDetailMenu = (id) => {
-
-            // ID表示
-            document.getElementById("target-id").textContent = id;
-
-            // 対象タスク取得
-            const task = document.querySelector(`[data-id="${id}"]`);
-
-            // const priorities = @Model.PriorityList
-            const priorities = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.PriorityList));
-            // 詳細表示
-            const priorityMap = new Map(
-                priorities.map(p => [p.id, p.priorityName])
-            );
-
-
-            document.getElementById("priorityId").textContent =
-                priorityMap.get(Number(task.dataset.priorityid)) ?? "" ;
-
-            document.getElementById("taskName").textContent =
-                task.dataset.taskname;
-
-            document.getElementById("deadlineAt").textContent =
-                task.dataset.deadlineat;
-
-            document.getElementById("contentText").textContent =
-                task.dataset.contenttext;
-
-            // 編集ボタン
             const editBtn = document.getElementById('edit-btn');
 
             const currentHref = editBtn.getAttribute('href');
 
-            editBtn.href = currentHref + '/' + id;
+            console.log(currentHref);
+            console.log('test');
+
+            editBtn.href = currentHref+'/'+id; 
+            
+            
+            const task = document.querySelector(`[data-id="${id}"]`);
+            if(!task){
+                console.error("task not found:", id);
+                return;
+            }
+            
+            // C#のPriorityListをJSで使える形(JSON)に変換して埋め込む
+            const priorities = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.PriorityList));
+            
+            // data-priorityidの値を取得
+            // Numberで数値に変換
+            const priId = Number(task.dataset.priorityid);
+            
+            // priorities配列から該当するデータを検索
+            const priority = priorities.find(x => x.PriorityId === priId);
+            
+            // priority?.PriorityNamepriority   が undefined でもエラーにならない
+            // ?? "不明"      PriorityName が無い or undefined の場合は "不明" を表示
+            priorityId.textContent = priority?.PriorityName ?? "不明";
+
+
+            // 値を表示
+            taskName.textContent = task.dataset.taskname;
+
+
+            deadlineAt.textContent = task.dataset.deadlineat;
+
+            contentText.textContent = task.dataset.contenttext;
+
         };
+
 
         // 3.TOPへ戻る
         // A.表示切替
@@ -327,9 +325,9 @@
 <!-- 右表示メニュー -->
 <div id="detail-menu" class="detail-menu">
 
-    <div id="target-id"></div>
-    <div id="priorityMap"></div>
+    <div id="target-taskid"></div>
     <div id="taskName"></div>
+    <div id="priorityId"></div>
     <div id="deadlineAt"></div>
     <div id="contentText"></div>
     <div></div>

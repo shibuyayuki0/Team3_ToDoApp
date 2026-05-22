@@ -86,7 +86,7 @@ public class TaskDataEditor : ITaskDataEditor
         };
 
         // 文字列結合＋idの降順ソート指定
-        sql += sqlConditions + " ORDER BY id DESC;";
+        sql += sqlConditions + " ORDER BY deadline_at ASC;";
 
         // === ここからDB接続 ===
         using var connection = new SqlConnection(_connectionString);

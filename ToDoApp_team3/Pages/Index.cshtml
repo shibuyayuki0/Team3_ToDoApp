@@ -46,36 +46,6 @@
             }
         }
 
-        @@media(min-width:576px) {
-            .custom-strike::before {
-                left: 75px;
-            }
-        }
-
-        @@media(min-width:768px) {
-            .custom-strike::before {
-                left: 50px;
-            }
-        }
-
-        @@media(min-width:992px) {
-            .custom-strike::before {
-                left: 70px;
-            }
-        }
-
-        @@media(min-width:1200px) {
-            .custom-strike::before {
-                left: 85px;
-            }
-        }
-
-        @@media(min-width:1400px) {
-            .custom-strike::before {
-                left: 100px;
-            }
-        }
-
         .return-button {
             opacity: 0;
             visibility: hidden;
@@ -114,7 +84,7 @@
             position: fixed;
             top: 0;
             right: 0;
-            width: 35vw;
+            width: 100vw;
             height: 100vh;
             z-index: 3000;
             background-color: #ffffff;
@@ -141,6 +111,48 @@
 
             to {
                 transform: translateX(0);
+            }
+        }
+
+        @@media(min-width:576px) {
+            .custom-strike::before {
+                left: 75px;
+            }
+        }
+
+        @@media(min-width:768px) {
+            .custom-strike::before {
+                left: 50px;
+            }
+        }
+
+        @@media(min-width:992px) {
+            .custom-strike::before {
+                left: 70px;
+            }
+
+            .detail-menu {
+                width: 75vw;
+            }
+        }
+
+        @@media(min-width:1200px) {
+            .custom-strike::before {
+                left: 85px;
+            }
+
+            .detail-menu {
+                width: 60vw;
+            }
+        }
+
+        @@media(min-width:1400px) {
+            .custom-strike::before {
+                left: 100px;
+            }
+
+            .detail-menu {
+                width: 45vw;
             }
         }
 
@@ -199,8 +211,8 @@
                 return;
             }
             
-            // 右クリックメニュー以外がクリックされたら
-            if (!e.target.closest('#detail-menu')){
+            // 右クリックメニュー以外または、閉じるボタンがクリックされたら
+            if (!e.target.closest('#detail-menu') || e.target.closest('#close-btn')){
                 overlay.classList.remove("active"); // 暗転解除
                 detailMenu.classList.remove("active"); // 詳細メニュー解除
                 return;
@@ -235,7 +247,7 @@
             
             // priority?.PriorityNamepriority   が undefined でもエラーにならない
             // ?? "不明"      PriorityName が無い or undefined の場合は "不明" を表示
-            priorityName.textContent = tempName?.PriorityName ?? "不明";
+            priorityName.textContent = '優先度：' + tempName?.PriorityName ?? "不明";
 
             // 詳細メニュー項目の色情報を消す
             priorityName.classList.remove(
@@ -259,7 +271,7 @@
 
             // 値を設定する
             taskName.textContent = targetTask.TaskName;
-            deadlineAt.textContent = targetTask.DeadlineAt;
+            deadlineAt.textContent = new Date(targetTask.DeadlineAt).toLocaleDateString();
             contentText.textContent = targetTask.ContentText;
         };
 
@@ -280,10 +292,6 @@
                 behavior: "smooth"
             });
         });
-
-
-
-
     </script>
 }
 
@@ -367,46 +375,44 @@
 <div id="overlay" class="overlay"></div>
 
 <!-- 右表示メニュー -->
-<div id="detail-menu" class="detail-menu">
-
-    <div id="target-taskid" data-taskid="target-taskid" hidden></div>
-
-    <div class="row mb-3">
-        <div class="border priority-box">
-            優先度：<span id="priority-name" class="fw-bold"></span>
+<div id="detail-menu" class="container detail-menu">
+    <!-- タイトル表示と優先度 -->
+    <div class="row mx-2 mb-3">
+        <!-- タイトル -->
+        <div class="col d-inline-block h3">タスクの詳細</div>
+        <!-- 優先度表示 -->
+        <div class="col-4 text-center priority-box">
+            <div id="priority-name" class="d-inline-block form-control"></div>
+        </div>
+        <!-- 閉じるボタン -->
+        <div class="col-2 text-center">
+            <button type="button" id="close-btn" class="btn btn-light d-inline-block">&#x00D7;</button>
         </div>
     </div>
-
-    <div class="row mb-3">
+    <!-- タスク名 -->
+    <div class="row mx-2 mb-3">
         <label class="form-label fw-bold">タスク名:</label>
-            <div id="task-name" class="form-control"></div>
+        <div id="task-name" class="form-control"></div>
     </div>
-
-    <div class="row mb-3">
+    <!-- 期限 -->
+    <div class="row mx-2 mb-3">
         <label class="form-label fw-bold">期限:</label>
-            <div id="deadline-at" class="form-control"></div>
+        <div id="deadline-at" class="form-control"></div>
     </div>
-
-    <div class="row mb-3">
+    <!-- 詳細内容 -->
+    <div class="row mx-2 mb-3">
         <label class="form-label fw-bold">詳細内容:</label>
-            <div id="content-text" class="form-control"></div>
+        <div id="content-text" class="form-control" style="min-height:200px;"></div>
     </div>
-
-    <div class="col-auto text-center d-flex gap-3">
+    <!-- ボタン類 -->
+    <div class="row mx-2 d-flex text-center">
         <!-- 更新ボタン -->
-        <div>
+        <div class="col-6">
             <!-- Bootstrapの改行防止クラス text-nowrapを追加 -->
             <a href="#" id="edit-btn" class="btn btn-primary text-nowrap">編集</a>
         </div>
-
-        <!-- 完了切り替え -->
-        <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
-            <label class="form-check-label" for="flexSwitchCheckDefault">オン/オフの切り替え</label>
-        </div>
-
         <!-- 削除ボタン（ms-auto を追加して右寄せ） -->
-        <form method="post" id="delete-form" class=" ms-auto">
+        <form method="post" id="delete-form" class="col ms-auto">
             <button type="button" id="delete-btn" data-target-id="" class="btn btn-outline-danger text-nowrap">削除</button>
         </form>
     </div>

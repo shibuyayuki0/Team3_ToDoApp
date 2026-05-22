@@ -70,10 +70,12 @@ namespace ToDoApp_team3.Pages
 
         // ===== 外観 =====
         // 登録画面の説明
-        public string FormTitle { get; private set; } = "タスクの新規作成";
+        [BindProperty]
+        public string FormTitle { get; set; } = "タスクの新規作成";
 
         // 登録ボタンの名称
-        public string PostButtonName { get; private set; } = "作成";
+        [BindProperty]
+        public string PostButtonName { get; set; } = "作成";
 
 
         // ===== メソッド =====

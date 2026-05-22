@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Reflection.Metadata.Ecma335;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using ToDoApp_team3.Model;
 
 namespace ToDoApp_team3.Pages
@@ -16,12 +16,9 @@ namespace ToDoApp_team3.Pages
         {
             _dataEditor = dataEditor;
 
+            // 優先度リスト
+            PriorityList = _dataEditor.PriorityList;
         }
-
-
-
-        //[BindProperty]
-        //public string FilterName { get; set; }
 
         [BindProperty]
         public int SelectedId { get; set; }
@@ -29,74 +26,41 @@ namespace ToDoApp_team3.Pages
         public List<ToDoApp_team3.Model.Tasks> TaskList { get; set; } = [];
         public List<Priorities> PriorityList { get; set; }= [];
 
-        public record Filters(ListFilterMode ListFilter,string FilterName);
 
+        // フィルターリスト
+        public List<SelectListItem> FilterList { get; } = [
+            new SelectListItem{ Value = ListFilterMode.Continue.ToString(), Text = "未完了" },
+            new SelectListItem{ Value = ListFilterMode.Complete.ToString(), Text = "完了" },
+            new SelectListItem{ Value = ListFilterMode.All.ToString(), Text = "すべて" }
+        ];
 
-        public List<Filters> FilterList { get; } = [
-            new Filters(ListFilterMode.Continue, "未完了"),
-            new Filters(ListFilterMode.Complete, "完了"),
-            new Filters(ListFilterMode.All, "すべて")];
+        // フィルターの選択肢（初期値は未完了）
+        [BindProperty(SupportsGet = true)]
+        public ListFilterMode SelectedFilter { get; set; } = ListFilterMode.Continue;
 
-        [BindProperty]
-        public int FilterNumber { get; set; } = 0;
-        //public List<(int id, string name)> ItemList { get; set; } = [];
-
-        //public DateTime DeadlineAt => DateTime.Now;
-
-        public void OnGet(int filterNumber)
+        // === GET ===
+        public void OnGet()
         {
-            //for (int i = 1; i <= 10; i++)
-            //{
-            //    ItemList.Add((i, $"ID：{i}のタスク"));
-            //}
-
-            // フィルターの設定
-            ListFilterMode filterMode = FilterList[filterNumber].ListFilter;
-            // タスクリストの取得
-            TaskList = _dataEditor.GetTaskList(filterMode);
-
-            //
-            PriorityList = [.._dataEditor.PriorityList];
-
+            TaskList = _dataEditor.GetTaskList(SelectedFilter);
         }
 
-        public IActionResult OnGetDetail(int id)
+        // === POST：削除 ===
+        public IActionResult OnPostDelete(int? id)
         {
-                 _dataEditor.GetTaskList(ListFilterMode.All)
-                .Where(x => x.TaskId == id)
-                .Select(x => new
-                {
-                    taskName = x.TaskName,
-                    deadlineAt = x.DeadlineAt,
-                    contentText = x.ContentText
-                })
-                .FirstOrDefault();
+            // id存在確認
+            if (!id.HasValue || _dataEditor.GetTask(id.Value) is null)
+            {
+                return BadRequest("無効なIDが渡されました。");
+            }
 
-            return new JsonResult(TaskList);
+            // 削除処理
+            _dataEditor.Delete(id.Value);
+
+            // インデックスに戻る
+            return RedirectToPage();
         }
 
-
-
-
-        //public void OnGetFiltering(string filterName)
-        //{
-        //    // 現在のフィルター状態を保持
-        //    FilterName = filterName;
-
-        //    // フィルターに応じて一覧取得
-        //    //TaskList = filterName switch
-        //    //{
-        //    //    "Continue" => _dataEditor.GetTaskList(ListFilterMode.Continue),
-        //    //    "Complete" => _dataEditor.GetTaskList(ListFilterMode.Complete),
-        //    //    "All" => _dataEditor.GetTaskList(ListFilterMode.All)
-        //    //};
-
-        //    // 優先度一覧も再取得
-        //    //PriorityList = _dataEditor.PriorityList;
-        //}
-
-   
-
+        // === POST：完了 ===
         //public IActionResult OnPostComplete(int SelectedId)
         //{
         //    try

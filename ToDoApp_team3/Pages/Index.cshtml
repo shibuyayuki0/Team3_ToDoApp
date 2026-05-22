@@ -46,36 +46,6 @@
             }
         }
 
-        @@media(min-width:576px) {
-            .custom-strike::before {
-                left: 75px;
-            }
-        }
-
-        @@media(min-width:768px) {
-            .custom-strike::before {
-                left: 50px;
-            }
-        }
-
-        @@media(min-width:992px) {
-            .custom-strike::before {
-                left: 70px;
-            }
-        }
-
-        @@media(min-width:1200px) {
-            .custom-strike::before {
-                left: 85px;
-            }
-        }
-
-        @@media(min-width:1400px) {
-            .custom-strike::before {
-                left: 100px;
-            }
-        }
-
         .return-button {
             opacity: 0;
             visibility: hidden;
@@ -114,7 +84,7 @@
             position: fixed;
             top: 0;
             right: 0;
-            width: 35vw;
+            width: 100vw;
             height: 100vh;
             z-index: 3000;
             background-color: #ffffff;
@@ -144,6 +114,48 @@
             }
         }
 
+        @@media(min-width:576px) {
+            .custom-strike::before {
+                left: 75px;
+            }
+        }
+
+        @@media(min-width:768px) {
+            .custom-strike::before {
+                left: 50px;
+            }
+        }
+
+        @@media(min-width:992px) {
+            .custom-strike::before {
+                left: 70px;
+            }
+
+            .detail-menu {
+                width: 75vw;
+            }
+        }
+
+        @@media(min-width:1200px) {
+            .custom-strike::before {
+                left: 85px;
+            }
+
+            .detail-menu {
+                width: 60vw;
+            }
+        }
+
+        @@media(min-width:1400px) {
+            .custom-strike::before {
+                left: 100px;
+            }
+
+            .detail-menu {
+                width: 45vw;
+            }
+        }
+
     </style>
 }
 
@@ -151,57 +163,56 @@
 <!-- JavaScript -->
 @section Scripts {
     <script>
+        // ページ内の要素
         const overlay = document.getElementById("overlay");
         const detailMenu = document.getElementById("detail-menu");
 
+        // 詳細メニューの要素
+        const editBtn = document.getElementById('edit-btn');        // 編集ボタン
+        const deleteForm = document.getElementById('delete-form');  // 削除ボタンのフォーム
+        const deleteBtn = document.getElementById('delete-btn');  // 削除ボタン
+        const taskName = document.getElementById("task-name");       // 詳細：タスク名
+        const priorityName = document.getElementById("priority-name");   // 詳細：優先度名称
+        const deadlineAt = document.getElementById("deadline-at");   // 詳細：期限
+        const contentText = document.getElementById("content-text"); // 詳細：詳細内容
 
-        
-        const taskName = document.getElementById("taskName");
-        const priorityId = document.getElementById("priorityId");
-        const deadlineAt = document.getElementById("deadlineAt");
-        const contentText = document.getElementById("contentText");
-
-
-        let targetTaskId; // 削除や編集を行う対象タスク
+        // C#のPriorityListをJSで使える形(JSON)に変換して埋め込む
+        const priorities = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.PriorityList));
 
         // 1.クリック時の処理
         document.addEventListener("click", (e) => {
-            // リンク先情報をクリア
-            targetTaskId = "";
-            
             // click-withoutだった時はスキップ
             if (e.target.closest('[click-without]')) {
                 return;
             }
 
+            // 削除ボタンが押されたら
+            const clickedDeleteBtn = e.target.closest('#delete-btn');
+            if (clickedDeleteBtn){
+                // idを取得する
+                const id = clickedDeleteBtn.dataset.targetId;
+                // クエリの設定
+                deleteForm.action = `?handler=delete&id=${id}`;
+                // submit
+                deleteForm.submit();
+                // ページ遷移して終了
+                return;
+            }
+
             // [data-id]属性をもっていれば処理
-            const targetTask = e.target.closest('[data-id]');
-            if (targetTask){
-                targetTaskId = targetTask.getAttribute("data-id");
-
-
+            const clickedTask = e.target.closest('[data-id]');
+            if (clickedTask){
+                const targetTaskId = clickedTask.getAttribute("data-id"); // クリックされたIDを取得する
 
                 overlay.classList.add("active"); // 暗転
                 detailMenu.classList.add("active"); // 詳細メニュー表示
 
-                setDetailMenu(targetTaskId);// 詳細メニューの値設定
+                setDetailMenu(targetTaskId);// 詳細メニューを設定する
                 return;
             }
-
-            // 削除ボタンが押されたら
-            const deleteBtn = e.target.closest('#menu-delete-btn');
-            if (deleteBtn){
-                const deleteForm = document.getElementById('delete-form');
-
-                // ハンドラーとIDを指定するURLクエリを追加
-                deleteForm.action = `?handler=delete&id=${targetTaskId}`;
-
-                // submit
-                deleteForm.submit();
-            }
             
-            // 右クリックメニュー以外がクリックされたら
-            if (!e.target.closest('#detail-menu')){
+            // 右クリックメニュー以外または、閉じるボタンがクリックされたら
+            if (!e.target.closest('#detail-menu') || e.target.closest('#close-btn')){
                 overlay.classList.remove("active"); // 暗転解除
                 detailMenu.classList.remove("active"); // 詳細メニュー解除
                 return;
@@ -209,73 +220,59 @@
 
         });
 
-        // 2.詳細メニューの値設定
-        const setDetailMenu = (id) => {
-            
-            const targetTaskId = document.getElementById("target-taskid");
+        // 2.詳細メニューの準備
+        const setDetailMenu = (id) => {            
+            // タスクの取得
+            const taskList = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TaskList));
+            const targetTask = taskList.find(task => task.TaskId == id); // 対象タスク
 
-            targetTaskId.textContent = id;
-
-
-
-
-            const editBtn = document.getElementById('edit-btn');
-
-            const currentHref = editBtn.getAttribute('href');
-
-            console.log(currentHref);
-            console.log('test');
-
-            editBtn.href = currentHref+'/'+id; 
-            
-            
-            const task = document.querySelector(`[data-id="${id}"]`);
-            if(!task){
-                console.error("task not found:", id);
+            // タスク不正として処理
+            if(!targetTask) {
+                console.error("指定されたタスクが見つかりません。ID:", id);
                 return;
             }
-            
-            // C#のPriorityListをJSで使える形(JSON)に変換して埋め込む
-            const priorities = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.PriorityList));
+
+            // 編集ボタンにidをセットする
+            editBtn.href = '/edit/' + id; 
+
+            // 削除ボタンにidをセットする
+            deleteBtn.dataset.targetId = id;
             
             // data-priorityidの値を取得
             // Numberで数値に変換
-            const priId = Number(task.dataset.priorityid);
+            const priorityId = targetTask.PriorityId;
             
             // priorities配列から該当するデータを検索
-            const priority = priorities.find(x => x.PriorityId === priId);
+            const tempName = priorities.find(x => x.PriorityId === priorityId);
             
             // priority?.PriorityNamepriority   が undefined でもエラーにならない
             // ?? "不明"      PriorityName が無い or undefined の場合は "不明" を表示
-            priorityId.textContent = priority?.PriorityName ?? "不明";
+            priorityName.textContent = '優先度：' + tempName?.PriorityName ?? "不明";
 
-
-            //
-            priorityId.classList.remove(
+            // 詳細メニュー項目の色情報を消す
+            priorityName.classList.remove(
                 "bg-danger","text-white",
                 "bg-warning","text-dark",
                 "bg-success",
             );
 
-            switch (priId) {
+            // 詳細メニュー項目の色情報を消す
+            switch (priorityId) {
                 case 1:
-                    priorityId.classList.add("bg-danger","text-white");
+                    priorityName.classList.add("bg-danger","text-white");
                     break;
                 case 2:
-                    priorityId.classList.add("bg-warning","text-dark");
+                    priorityName.classList.add("bg-warning","text-dark");
                     break;
                 case 3:
-                    priorityId.classList.add("bg-success","text-white");
+                    priorityName.classList.add("bg-success","text-white");
                     break;
             }
-            // 値を表示
-            taskName.textContent = task.dataset.taskname;
 
-
-            deadlineAt.textContent = task.dataset.deadlineat;
-
-            contentText.textContent = task.dataset.contenttext;
-
+            // 値を設定する
+            taskName.textContent = targetTask.TaskName;
+            deadlineAt.textContent = new Date(targetTask.DeadlineAt).toLocaleDateString();
+            contentText.textContent = targetTask.ContentText;
         };
 
 
@@ -295,13 +292,8 @@
                 behavior: "smooth"
             });
         });
-
-
-
-
     </script>
 }
-
 
 <!-- ヘッダーパーツ -->
 @section AdditionalHeader {
@@ -357,12 +349,7 @@
 
         <!-- タスク1件 -->
         <div class="row">
-            <div class="d-flex align-items-center shadow border rounded-3 py-2 mb-3 @taskColor"
-                 data-id="@item.TaskId"
-                 data-priorityid="@item.PriorityId"
-                 data-taskname="@item.TaskName"
-                 data-deadlineat="@item.DeadlineAt"
-                 data-contenttext="@item.ContentText">
+            <div class="d-flex align-items-center shadow border rounded-3 py-2 mb-3 @taskColor" data-id="@item.TaskId">
                 <!-- チェックボタン -->
                 <form method="post" asp-page-handler="Complete" asp-route-id="@item.TaskId" class="col-2 col-md-1 d-inline-block text-center">
                     <input type="hidden" asp-for="SelectedFilter" />
@@ -388,48 +375,45 @@
 <div id="overlay" class="overlay"></div>
 
 <!-- 右表示メニュー -->
-<div id="detail-menu" class="detail-menu">
-
-    <div id="target-taskid" data-taskid="target-taskid" hidden></div>
-
-    <div class="row mb-3">
-        <div class="border priority-box">
-            優先度：<span id="priorityId" class="fw-bold"></span>
+<div id="detail-menu" class="container detail-menu">
+    <!-- タイトル表示と優先度 -->
+    <div class="row mx-2 mb-3">
+        <!-- タイトル -->
+        <div class="col d-inline-block h3">タスクの詳細</div>
+        <!-- 優先度表示 -->
+        <div class="col-4 text-center priority-box">
+            <div id="priority-name" class="d-inline-block form-control"></div>
+        </div>
+        <!-- 閉じるボタン -->
+        <div class="col-2 text-center">
+            <button type="button" id="close-btn" class="btn btn-light d-inline-block">&#x00D7;</button>
         </div>
     </div>
-
-    <div class="row mb-3">
+    <!-- タスク名 -->
+    <div class="row mx-2 mb-3">
         <label class="form-label fw-bold">タスク名:</label>
-            <div id="taskName" class="form-control"></div>
+        <div id="task-name" class="form-control"></div>
     </div>
-
-    <div class="row mb-3">
+    <!-- 期限 -->
+    <div class="row mx-2 mb-3">
         <label class="form-label fw-bold">期限:</label>
-            <div id="deadlineAt" class="form-control"></div>
+        <div id="deadline-at" class="form-control"></div>
     </div>
-
-    <div class="row mb-3">
+    <!-- 詳細内容 -->
+    <div class="row mx-2 mb-3">
         <label class="form-label fw-bold">詳細内容:</label>
-            <div id="contentText" class="form-control"></div>
+        <div id="content-text" class="form-control" style="min-height:200px;"></div>
     </div>
-
-    <div class="col-auto text-center d-flex gap-3">
+    <!-- ボタン類 -->
+    <div class="row mx-2 d-flex text-center">
         <!-- 更新ボタン -->
-        <div>
+        <div class="col-6">
             <!-- Bootstrapの改行防止クラス text-nowrapを追加 -->
-            <a asp-page="/ToDoEditor" id="edit-btn" class="btn btn-primary text-nowrap">編集</a>
+            <a href="#" id="edit-btn" class="btn btn-primary text-nowrap">編集</a>
         </div>
-
-        <!-- 完了切り替え -->
-        <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
-            <label class="form-check-label" for="flexSwitchCheckDefault">オン/オフの切り替え</label>
-        </div>
-
-
         <!-- 削除ボタン（ms-auto を追加して右寄せ） -->
-        <form method="post" id="delete-form" class=" ms-auto">
-            <button type="button" id="menu-delete-btn" class="btn btn-outline-danger text-nowrap">削除</button>
+        <form method="post" id="delete-form" class="col ms-auto">
+            <button type="button" id="delete-btn" data-target-id="" class="btn btn-outline-danger text-nowrap">削除</button>
         </form>
     </div>
 

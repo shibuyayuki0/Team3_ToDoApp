@@ -28,7 +28,8 @@ public class TaskDataEditor : ITaskDataEditor
             SELECT
                 priority_id AS [PriorityId],
                 priority_name AS [PriorityName]
-            FROM priorities;
+            FROM priorities
+            ORDER BY priority_id ASC;
         ";
 
         // === ここからDB接続 ===

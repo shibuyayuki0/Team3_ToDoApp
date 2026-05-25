@@ -5,16 +5,13 @@
 /// </summary>
 public interface ITaskDataEditor
 {
-    /// <summary>
-    /// 優先度を表すリスト
-    /// </summary>
-    List<Priorities> PriorityList { get; }
+    // ===== クエリ（参照系） =====
 
     /// <summary>
-    /// タスクを1件追加する
+    /// 優先度リストの取得
     /// </summary>
-    /// <param name="newTask">追加したいタスク</param>
-    void Add(Tasks newTask);
+    /// <returns>優先度リスト</returns>
+    List<Priorities> GetPriorityList();
 
     /// <summary>
     /// タスクの一覧を取得する
@@ -29,6 +26,15 @@ public interface ITaskDataEditor
     /// <param name="taskId">取得するタスクのID</param>
     /// <returns>タスク1件のデータ、タスクIDが存在しない場合はNULL</returns>
     Tasks? GetTask(int taskId);
+
+
+    // ===== コマンド（書き込み系） =====
+
+    /// <summary>
+    /// タスクを1件追加する
+    /// </summary>
+    /// <param name="newTask">追加したいタスク</param>
+    void Add(Tasks newTask);
 
     /// <summary>
     /// タスクの内容を更新する

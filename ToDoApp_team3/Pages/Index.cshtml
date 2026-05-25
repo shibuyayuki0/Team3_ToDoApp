@@ -46,6 +46,11 @@
             }
         }
 
+        .alart-icon {
+            font-size:1.5rem;
+            letter-spacing:1rem;
+        }
+
         .return-button {
             opacity: 0;
             visibility: hidden;
@@ -123,6 +128,11 @@
         @@media(min-width:768px) {
             .custom-strike::before {
                 left: 50px;
+            }
+
+            .alart-icon {
+                font-size: 2.5rem;
+                letter-spacing: 0.5rem;
             }
         }
 
@@ -298,19 +308,19 @@
 <!-- ヘッダーパーツ -->
 @section AdditionalHeader {
     <!-- タスクリスト項目名 -->
-    <div class="d-flex align-items-center">
+    <div class="row align-items-center">
         <!-- 作成ボタン -->
-        <div class="col-2 col-md-1 d-inline-block">
+        <div class="col-2 col-xl-1 text-center">
             <a asp-page="/ToDoEditor" class="btn btn-primary">作成</a>
         </div>
         <!-- タスク名 -->
-        <div class="col-7 col-md-6 d-inline-block fw-bold">タスク名</div>
+        <div class="col-6 col-sm-7 col-md-6 fw-bold">タスク名</div>
         <!-- 期限 -->
-        <div class="col-2 d-inline-block fw-bold">期限</div>
+        <div class="col fw-bold">期限</div>
         <!-- フィルター -->
-        <div class="col d-inline-block">
+        <div class="col-4 col-md-3 d-inline-block">
             <form method="get" class="input-group w-auto flex-nowrap">
-                <label class="input-group-text d-none d-lg-inline-block">表示</label>
+                <label class="input-group-text d-none d-xl-inline-block">表示</label>
                 <select asp-for="SelectedFilter" asp-items="@Model.FilterList" class="form-select" onchange="this.form.submit()"></select>
             </form>
         </div>
@@ -351,15 +361,15 @@
         <div class="row">
             <div class="d-flex align-items-center shadow border rounded-3 py-2 mb-3 @taskColor" data-id="@item.TaskId">
                 <!-- チェックボタン -->
-                <form method="post" asp-page-handler="Complete" asp-route-id="@item.TaskId" class="col-2 col-md-1 d-inline-block text-center">
+                <form method="post" asp-page-handler="Complete" asp-route-id="@item.TaskId" class="col-2 col-xl-1 text-centerd-inline-block">
                     <input type="hidden" asp-for="SelectedFilter" />
                     <input type="checkbox" checked="@isCompleted" onchange="this.form.submit()" click-without class="btn-complete" />
                 </form>
                 <!-- タスク名 -->
-                <div class="col-6 col-md-5 fw-bold">@item.TaskName</div>
+                <div class="col-5 col-sm-6 col-md-5 fw-bold">@item.TaskName</div>
                 <!-- 警告表示 -->
-                <div class="col-1 d-inline-block text-end">
-                    <span class="@activeMark" style="font-size:2.5rem; letter-spacing:0.5rem;">&#x26A0;&#xFE0F;</span>
+                <div class="col-1 d-inline-block text-center text-md-end">
+                    <span class="alart-icon @activeMark">&#x26A0;&#xFE0F;</span>
                 </div>
                 <!-- 期限 -->
                 <div class="col fw-bold">@item.DeadlineAt.ToString("yyyy/MM/dd")</div>

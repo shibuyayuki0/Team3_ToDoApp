@@ -22,7 +22,7 @@ public class TaskDataEditor : ITaskDataEditor
     // ===== クエリ（参照系） =====
 
     // 優先度リスト　→　非同期で取得するのでメソッド化
-    public async Task<List<Priorities>> GetPriorityListAsync()
+    public List<Priorities> GetPriorityList()
     {
         var sql = @"
             SELECT
@@ -35,11 +35,12 @@ public class TaskDataEditor : ITaskDataEditor
         using var connection = new SqlConnection(_connectionString);
 
         // Prioritiesのリストを返す
-        return [.. await connection.QueryAsync<Priorities>(sql)];
+        var priorities = connection.Query<Priorities>(sql);
+        return [.. priorities];
     }
 
     // タスクリストの取得
-    public async Task<List<Tasks>> GetTaskListAsync(ListFilterMode mode)
+    public List<Tasks> GetTaskList(ListFilterMode mode)
     {
         // タスクを全行取得する（条件：論理削除されていないもの）
         var sql = @"
@@ -56,7 +57,7 @@ public class TaskDataEditor : ITaskDataEditor
         // modeによって追加の条件を付加する（未完了or完了orすべて）
         var sqlConditions = mode switch
         {
-            ListFilterMode.Continue => " AND completed_at IS NULL ",
+            ListFilterMode.Continue => " AND completed_at IS NULL",
             ListFilterMode.Complete => " AND completed_at IS NOT NULL",
             _ => ""
         };
@@ -68,7 +69,7 @@ public class TaskDataEditor : ITaskDataEditor
         using var connection = new SqlConnection(_connectionString);
 
         // List型に変換して返す
-        var taskList = await connection.QueryAsync<Tasks>(sql);
+        var taskList = connection.Query<Tasks>(sql);
         return [.. taskList];
         // ①スプレッド演算子(..)で、taskListの戻り値をバラバラにする
         // ②コレクション式（[]）で、List型として再構成される
@@ -76,7 +77,7 @@ public class TaskDataEditor : ITaskDataEditor
     }
 
     // タスク1件の取得、なければNULL
-    public async Task<Tasks?> GetTaskAsync(int taskId)
+    public Tasks? GetTask(int taskId)
     {
         // 1個のタスクを取得するsql文
         var sql = @"
@@ -95,14 +96,15 @@ public class TaskDataEditor : ITaskDataEditor
         using var connection = new SqlConnection(_connectionString);
 
         // ヒットしたタスクを返す、ヒットしないときはNULLを返す
-        return await connection.QueryFirstOrDefaultAsync<Tasks>(sql, new { id = taskId });
+        var task = connection.QueryFirstOrDefault<Tasks>(sql, new { id = taskId });
+        return task;
     }
 
 
     // ===== コマンド（書き込み系） =====
 
     // タスクの追加
-    public async Task AddAsync(Tasks newTask)
+    public void Add(Tasks newTask)
     {
         // タスクを追加する
         // created_atにはCURRENT_TIMESTAMP（現在時刻）を入れる
@@ -126,7 +128,7 @@ public class TaskDataEditor : ITaskDataEditor
         using var connection = new SqlConnection(_connectionString);
 
         // sql実行、戻り値（影響を受けた件数）は使わない
-        _ = await connection.ExecuteAsync(
+        _ = connection.Execute(
             sql,
             new
             {
@@ -138,7 +140,7 @@ public class TaskDataEditor : ITaskDataEditor
     }
 
     // タスク更新
-    public async Task UpdateAsync(Tasks targetTask)
+    public void Update(Tasks targetTask)
     {
         // タスクIDを取得する
         int taskId = targetTask.TaskId;
@@ -160,7 +162,7 @@ public class TaskDataEditor : ITaskDataEditor
         using var connection = new SqlConnection(_connectionString);
 
         // sqlを実行し、実際に影響を受けた件数を取得する
-        var affectedTasks = await connection.ExecuteAsync(
+        var affectedTasks = connection.Execute(
             sql,
             new
             {
@@ -175,12 +177,12 @@ public class TaskDataEditor : ITaskDataEditor
         // 件数が0のとき（影響を受けたタスクがない）は、taskIDがおかしいと表示
         if (affectedTasks == 0)
         {
-            throw new KeyNotFoundException($"ID：{taskId}というタスクは存在しません。");
+            throw new KeyNotFoundException($"ID：{taskId}というタスクは存在しない、または既に削除されています");
         }
     }
 
     // タスク削除
-    public async Task DeleteAsync(int taskId)
+    public void Delete(int taskId)
     {
         // tasksテーブルのdeleted_atにタイムスタンプを入れる
         // WHEREで①idが指定したもの、②deleted_atがnullのもの（＝まだ削除されていないタスク）に限定している
@@ -194,12 +196,12 @@ public class TaskDataEditor : ITaskDataEditor
         using var connection = new SqlConnection(_connectionString);
 
         // sqlを実行し、実際に影響を受けた件数を取得する
-        var affectedTasks = await connection.ExecuteAsync(sql, new { id = taskId });
+        var affectedTasks = connection.Execute(sql, new { id = taskId });
 
         // 件数が0のとき（影響を受けたタスクがない）は、taskIDがおかしいと表示
         if (affectedTasks == 0)
         {
-            throw new KeyNotFoundException($"ID：{taskId}というタスクは存在しません。");
+            throw new KeyNotFoundException($"ID：{taskId}というタスクは存在しない、または既に削除されています");
         }
     }
 }

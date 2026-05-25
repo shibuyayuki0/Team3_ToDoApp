@@ -37,15 +37,15 @@ public class IndexModel(ITaskDataEditor dataEditor) : PageModel
     // ===== メソッド =====
 
     // GET
-    public async Task<IActionResult> OnGetAsync()
+    public IActionResult OnGet()
     {
         // --- DB接続 ---
         try
         {
             // 優先度リストの取得
-            PriorityList = await _dataEditor.GetPriorityListAsync();
+            PriorityList = _dataEditor.GetPriorityList();
             // タスクリストの取得
-            TaskList = await _dataEditor.GetTaskListAsync(SelectedFilter);
+            TaskList = _dataEditor.GetTaskList(SelectedFilter);
         }
         catch (SqlException)
         {
@@ -69,15 +69,15 @@ public class IndexModel(ITaskDataEditor dataEditor) : PageModel
         try
         {
             // 削除処理
-            await _dataEditor.DeleteAsync(id.Value);
+            _dataEditor.Delete(id.Value);
         }
         catch (SqlException)
         {
             return StatusCode(500, "データベース接続に失敗しました。管理者に問い合わせてください。");
         }
-        catch (KeyNotFoundException)
+        catch (KeyNotFoundException ex)
         {
-            return BadRequest("指定されたタスクは存在しないか、すでに削除されています。");
+            return BadRequest($"{ex.Message}"); // タスクIDxxは存在しない、または既に削除されています。
         }
 
         // インデックスに戻る
@@ -92,7 +92,7 @@ public class IndexModel(ITaskDataEditor dataEditor) : PageModel
         try
         {
             // タスクを取得する
-            targetTask = await _dataEditor.GetTaskAsync(id);
+            targetTask = _dataEditor.GetTask(id);
         }
         catch (SqlException)
         {
@@ -115,15 +115,15 @@ public class IndexModel(ITaskDataEditor dataEditor) : PageModel
         try
         {
             // タスクを更新する
-            await _dataEditor.UpdateAsync(newTask);
+            _dataEditor.Update(newTask);
         }
         catch (SqlException)
         {
             return StatusCode(500, "データベース接続に失敗しました。管理者に問い合わせてください。");
         }
-        catch (KeyNotFoundException)
+        catch (KeyNotFoundException ex)
         {
-            return BadRequest("指定されたタスクは存在しないか、すでに削除されています。");
+            return BadRequest($"{ex.Message}"); // タスクIDxxは存在しない、または既に削除されています。
         }
 
         // RedirectToPage("/Index",...)同じフォルダ内にあるIndexページへ画面を移動

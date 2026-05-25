@@ -63,7 +63,7 @@ public class ToDoEditorModel(ITaskDataEditor dataEditor) : PageModel
     // ===== メソッド =====
 
     // GET：画面表示
-    public async Task<IActionResult> OnGetAsync(string? id)
+    public IActionResult OnGet(string? id)
     {
         // idが
         //   null：新規作成モード
@@ -75,7 +75,7 @@ public class ToDoEditorModel(ITaskDataEditor dataEditor) : PageModel
         try
         {
             // 優先度リストをプルダウンメニューとして組立
-            await SetSelectList();
+            SetSelectList();
         }
         catch (SqlException)
         {
@@ -96,7 +96,7 @@ public class ToDoEditorModel(ITaskDataEditor dataEditor) : PageModel
             try
             {
                 // タスクを取得
-                targetTask = await _dataEditor.GetTaskAsync(parsedId);
+                targetTask = _dataEditor.GetTask(parsedId);
             }
             catch (SqlException)
             {
@@ -125,7 +125,7 @@ public class ToDoEditorModel(ITaskDataEditor dataEditor) : PageModel
     }
 
     // POST：新規作成または更新
-    public async Task<IActionResult> OnPostAsync(int? id)
+    public IActionResult OnPost(int? id)
     {
         // 必須入力欄がないとき
         if (!ModelState.IsValid)
@@ -134,7 +134,7 @@ public class ToDoEditorModel(ITaskDataEditor dataEditor) : PageModel
             try
             {
                 // 優先度リストをプルダウンメニューとして組立
-                await SetSelectList();
+                SetSelectList();
             }
             catch (SqlException)
             {
@@ -165,7 +165,7 @@ public class ToDoEditorModel(ITaskDataEditor dataEditor) : PageModel
             try
             {
                 // DBに登録する
-                await _dataEditor.AddAsync(newTask);
+                _dataEditor.Add(newTask);
             }
             catch (SqlException)
             {
@@ -182,7 +182,7 @@ public class ToDoEditorModel(ITaskDataEditor dataEditor) : PageModel
             try
             {
                 // 対象タスク状態を取得する
-                targetTask = await _dataEditor.GetTaskAsync(id.Value);
+                targetTask = _dataEditor.GetTask(id.Value);
             }
             catch (SqlException)
             {
@@ -209,15 +209,15 @@ public class ToDoEditorModel(ITaskDataEditor dataEditor) : PageModel
             try
             {
                 // タスクを更新する
-                await _dataEditor.UpdateAsync(updateTask);
+                _dataEditor.Update(updateTask);
             }
             catch (SqlException)
             {
                 return StatusCode(500, "データベース接続に失敗しました。管理者に問い合わせてください。");
             }
-            catch (KeyNotFoundException)
+            catch (KeyNotFoundException ex)
             {
-                return BadRequest("指定されたタスクは存在しないか、すでに削除されています。");
+                return BadRequest($"{ex.Message}"); // タスクIDxxは存在しない、または既に削除されています。
             }
         }
 
@@ -228,10 +228,10 @@ public class ToDoEditorModel(ITaskDataEditor dataEditor) : PageModel
     // ===== ヘルパー =====
 
     // 優先度リストの組立
-    private async Task SetSelectList()
+    private void SetSelectList()
     {
         // 優先度リストを取得する
-        var priorities = await _dataEditor.GetPriorityListAsync();
+        var priorities = _dataEditor.GetPriorityList();
 
         // セレクトリストを作る
         List<SelectListItem> options = [];

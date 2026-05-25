@@ -172,7 +172,7 @@ public IActionResult OnPost(int? id) {
 のように、IDを受け取り直すことも可能です。  
 今回であれば、IDなし＝ADD（新規作成）、IDあり＝UPDATE（更新）のように分岐します。  
 なお、OnGetですでにIdは、正常な範囲のINT型である（不正な文字列や範囲外インデックスを排除）と確定させているので、OnPost側ではInt?として受け取っています。  
-
+<br/>
 参考：[ルートテンプレートの活用 - Microsoft Lean](https://learn.microsoft.com/ja-jp/aspnet/core/tutorials/razor-pages/da1?view=aspnetcore-10.0#add-route-template:~:text=id%3D1%20%E3%81%A7%E3%81%99%E3%80%82-,%E3%83%AB%E3%83%BC%E3%83%88%20%E3%83%86%E3%83%B3%E3%83%97%E3%83%AC%E3%83%BC%E3%83%88%E3%81%AE%E8%BF%BD%E5%8A%A0,-Razor%20%E3%83%AB%E3%83%BC%E3%83%88%20%E3%83%86%E3%83%B3%E3%83%97%E3%83%AC%E3%83%BC%E3%83%88)<br/>
 参考：[Razor PagesでURLパラメーターを取得する](https://www.ipentec.com/document/csharp/csharp-asp-net-core-razor-pages-get-url-parameter) <br/>
 

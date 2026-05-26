@@ -57,7 +57,7 @@ public class IndexModel(ITaskDataEditor dataEditor) : PageModel
     }
 
     // POST：削除
-    public async Task<IActionResult> OnPostDeleteAsync(int? id)
+    public IActionResult OnPostDelete(int? id)
     {
         // id存在確認
         if (!id.HasValue)
@@ -85,7 +85,7 @@ public class IndexModel(ITaskDataEditor dataEditor) : PageModel
     }
 
     // POST：完了
-    public async Task<IActionResult> OnPostCompleteAsync(int id)
+    public IActionResult OnPostComplete(int id)
     {
         // --- DB接続 ---
         Tasks? targetTask;
